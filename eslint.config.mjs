@@ -12,16 +12,14 @@ export default tseslint.config(
     files: ['**/*.ts'],
     languageOptions: {
       parserOptions: {
+        projectService: true,
+        tsconfigRootDir: import.meta.dirname,
         project: './tsconfig.json',
+        sourceType: 'commonjs',
       },
       globals: {
         ...globals.node,
         ...globals.jest,
-      },
-      sourceType: 'commonjs',
-      parserOptions: {
-        projectService: true,
-        tsconfigRootDir: import.meta.dirname,
       },
     },
     plugins: {
