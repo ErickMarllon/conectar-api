@@ -5,7 +5,7 @@ WORKDIR /app
 FROM base AS development
 
 COPY package*.json yarn.lock ./
-RUN yarn install
+RUN yarn install --frozen-lockfile
 
 COPY . .
 
@@ -23,7 +23,6 @@ RUN yarn workspaces focus --production
 FROM node:20-alpine AS production
 WORKDIR /app
 
-RUN npm install -g yarn
 
 COPY --from=builder /app/package.json ./
 COPY --from=builder /app/dist ./dist

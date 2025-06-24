@@ -122,7 +122,6 @@ export class AuthenticationController {
     type: UserOutputDto,
   })
   async getMe(@CurrentUser() user: UserOutputDto): Promise<UserOutputDto> {
-    console.log('getMe', this.frontendUrl);
     return {
       user_id: user?.user_id,
       first_name: user?.first_name,
