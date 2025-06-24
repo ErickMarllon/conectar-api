@@ -18,7 +18,7 @@ FROM base AS builder
 COPY --from=development /app /app
 RUN yarn build
 
-RUN yarn workspaces focus --production
+RUN yarn install --production --frozen-lockfile
 
 FROM node:20-alpine AS production
 WORKDIR /app
