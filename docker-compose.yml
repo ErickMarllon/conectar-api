@@ -1,0 +1,56 @@
+services:
+  app:
+    container_name: conectar-app
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    env_file:
+      - .env
+    ports:
+      - '3000:3000'
+    networks:
+      - conectar-network
+    volumes:
+      - .:/app
+      - /app/node_modules
+
+  db:
+    image: postgres:16
+    container_name: conectar-postgres
+    restart: always
+    environment:
+      POSTGRES_DB: conectar-company
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      TZ: 'UTC'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+    networks:
+      - conectar-network
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: conectar-pgadmin
+    restart: always
+    ports:
+      - '18080:80'
+    volumes:
+      - pgadmin_data:/root/.pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: 12345678
+      PGADMIN_CONFIG_WTF_CSRF_ENABLED: 'False'
+      PGADMIN_CONFIG_ENHANCED_COOKIE_PROTECTION: 'False'
+    networks:
+      - conectar-network
+
+volumes:
+  postgres_data:
+  pgadmin_data:
+
+networks:
+  conectar-network:
+    driver: bridge

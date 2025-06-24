@@ -6,16 +6,15 @@ import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
   eslint.configs.recommended,
-  ...tseslint.configs.recommendedTypeChecked,
+  ...tseslint.configs.recommended,
   eslintPluginPrettierRecommended,
   {
     files: ['**/*.ts'],
     languageOptions: {
       parserOptions: {
-        projectService: true,
-        tsconfigRootDir: import.meta.dirname,
         project: './tsconfig.json',
         sourceType: 'commonjs',
+        tsconfigRootDir: new URL('.', import.meta.url).pathname,
       },
       globals: {
         ...globals.node,
@@ -29,7 +28,6 @@ export default tseslint.config(
   {
     rules: {
       'prettier/prettier': 'warn',
-
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-floating-promises': 'warn',
       '@typescript-eslint/no-unsafe-argument': 'warn',
