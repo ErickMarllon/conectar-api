@@ -59,14 +59,19 @@ export class AuthenticationService {
     );
 
     if (existingSession && existingSession.user) {
-      return this.updateOAuthUser(existingSession, authDTO);
+      return await this.updateOAuthUser(existingSession);
     }
 
     const user = await this.userService.findOrCreate(userDTO);
 
-    await this.createSession(user.id, { ...authDTO });
+    const session = await this.createSession(user.id, {
+      ...authDTO,
+    });
 
-    return user;
+    return plainToInstance(LoginResDto, {
+      access_token: session.access_token,
+      refresh_token: session.refresh_token,
+    });
   }
 
   async signIn(input: LoginReqDto) {
@@ -124,7 +129,25 @@ export class AuthenticationService {
     });
   }
 
-  private async updateOAuthUser(existingSession: Session, authDTO: OAuthDTO) {
+  async refreshToken(dto: RefreshReqDto): Promise<Token> {
+    const { source_id } = await this.verifyToken<Partial<Session>>(
+      dto.refreshToken,
+      this.refreshSecret,
+    );
+    if (!source_id) {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
+    const session = await this.validateSession(source_id);
+
+    await this.sessionRepository.update(session.id, session);
+    return this.generateAuthTokens(
+      session.user_id,
+      session.user.email,
+      session.user.role,
+    );
+  }
+
+  private async updateOAuthUser(existingSession: Session) {
     const tokens = await this.generateAuthTokens(
       existingSession.user.id,
       existingSession.user.email,
@@ -132,9 +155,9 @@ export class AuthenticationService {
     );
 
     await this.updateSession(existingSession.id, {
-      access_token: authDTO.access_token || tokens.access_token,
-      refresh_token: authDTO.refresh_token || tokens.refresh_token,
-      expires: this.parseExpiration(authDTO.expires || tokens.expires),
+      access_token: tokens.access_token,
+      refresh_token: tokens.refresh_token,
+      expires: this.parseExpiration(tokens.expires),
     });
     return existingSession.user;
   }
@@ -208,23 +231,6 @@ export class AuthenticationService {
     return this.sessionRepository.save(session);
   }
 
-  async refreshToken(dto: RefreshReqDto): Promise<Token> {
-    const { source_id } = await this.verifyToken<Partial<Session>>(
-      dto.refreshToken,
-      this.refreshSecret,
-    );
-    if (!source_id) {
-      throw new UnauthorizedException('Invalid refresh token');
-    }
-    const session = await this.validateSession(source_id);
-
-    await this.sessionRepository.update(session.id, session);
-    return this.generateAuthTokens(
-      session.user_id,
-      session.user.email,
-      session.user.role,
-    );
-  }
   private async verifyToken<T extends object>(
     token: string,
     secret: string,
@@ -235,6 +241,7 @@ export class AuthenticationService {
       throw new UnauthorizedException('Invalid token');
     }
   }
+
   private async validateSession(sessionId: string): Promise<Session> {
     const session = await this.sessionRepository.findOneBy({
       id: sessionId,

@@ -1,3 +1,4 @@
+import { UserRole } from '@/shared/enums/app.enum';
 import { ApiProperty } from '@nestjs/swagger';
 import { Exclude, Expose } from 'class-transformer';
 import { IsNumber, IsString } from 'class-validator';
@@ -23,6 +24,13 @@ export class LoginResDto {
   @IsString()
   @ApiProperty({ example: 'user@email.com' })
   email: string;
+
+  @Expose()
+  @IsString()
+  @ApiProperty({
+    example: UserRole.ADMIN,
+  })
+  role: string;
 
   @Expose()
   @IsString()

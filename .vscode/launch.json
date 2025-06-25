@@ -5,12 +5,19 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "command": "npm start",
+      "name": "docker compose up",
+      "request": "launch",
+      "type": "node-terminal"
+    },
+    {
       "type": "node",
       "request": "launch",
-      "name": "Iniciar o Programa",
+      "name": "Debug NestJS docker",
       "skipFiles": ["<node_internals>/**"],
-      "program": "${workspaceFolder}/src/shared/decorators/http.decorators.ts",
-      "outFiles": ["${workspaceFolder}/**/*.js"]
+      "program": "${workspaceFolder}/src/main.ts",
+      "outFiles": ["${workspaceFolder}/**/*.js"],
+      "envFile": "${workspaceFolder}/.env"
     }
   ]
 }

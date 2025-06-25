@@ -2,6 +2,8 @@ import { MigrationInterface, QueryRunner, Table } from 'typeorm';
 
 export class CreateUserTable1721488504680 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`);
+
     await queryRunner.query(`
       CREATE TYPE "user_role_enum" AS ENUM ('USER', 'ADMIN');
     `);

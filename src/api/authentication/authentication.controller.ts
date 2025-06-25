@@ -73,6 +73,7 @@ export class AuthenticationController {
       picture: session?.user?.picture,
       access_token: session?.access_token,
       refresh_token: session?.refresh_token,
+      role: session?.user?.role,
     };
   }
 
@@ -130,6 +131,7 @@ export class AuthenticationController {
       picture: user?.picture,
       access_token: user?.access_token,
       refresh_token: user?.refresh_token,
+      role: user?.role,
     };
   }
 

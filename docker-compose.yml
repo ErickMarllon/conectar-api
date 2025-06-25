@@ -4,10 +4,9 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      target: development
     env_file: .env
     ports:
-      - 3000:3333
+      - 3000:3000
     volumes:
       - .:/app
     depends_on:
@@ -17,7 +16,7 @@ services:
       - conectar-network
 
   db:
-    image: postgres:16-alpine
+    image: postgres:16
     container_name: conectar-postgres
     environment:
       POSTGRES_DB: conectar-company
