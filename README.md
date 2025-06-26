@@ -29,10 +29,10 @@ API RESTful desenvolvida em [NestJS](https://nestjs.com/) para gestão de usuár
 
 **Aplicação hospedada na Vercel:**
 
-- [https://conectar-app.vercel.app/dashboard](https://conectar-app.vercel.app)
-- [https://conectar-app-erickmarllons-projects.vercel.app/dashboard](https://conectar-app-erickmarllons-projects.vercel.app)
-- [https://conectar-app-git-main-erickmarllons-projects.vercel.app/dashboard](https://conectar-app-git-main-erickmarllons-projects.vercel.app)
-- [https://conectar-kyiijwg4f-erickmarllons-projects.vercel.app/](https://conectar-kyiijwg4f-erickmarllons-projects.vercel.app)
+- [https://conectar-app.vercel.app](https://conectar-app.vercel.app)
+- [https://conectar-app-erickmarllons-projects.vercel.app](https://conectar-app-erickmarllons-projects.vercel.app)
+- [https://conectar-app-git-main-erickmarllons-projects.vercel.app](https://conectar-app-git-main-erickmarllons-projects.vercel.app)
+- [https://conectar-kyiijwg4f-erickmarllons-projects.vercel.app](https://conectar-kyiijwg4f-erickmarllons-projects.vercel.app)
 
 ---
 
