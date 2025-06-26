@@ -6,6 +6,7 @@ API RESTful desenvolvida em [NestJS](https://nestjs.com/) para gestão de usuár
 
 ## Sumário
 
+- [Links do Projeto Conectar](#links-do-projeto-conectar)
 - [Rotas Principais](#rotas-principais)
 - [Serviços](#serviços)
 - [Infraestrutura](#infraestrutura)
@@ -16,6 +17,35 @@ API RESTful desenvolvida em [NestJS](https://nestjs.com/) para gestão de usuár
 - [Swagger](#swagger)
 - [Docker](#docker)
 - [Licença](#licença)
+
+---
+
+## Links do Projeto Conectar
+
+### Front-end
+
+**Repositório do código fonte:**  
+[https://github.com/ErickMarllon/conectar-app](https://github.com/ErickMarllon/conectar-app)
+
+**Aplicação hospedada na Vercel:**
+
+- [https://conectar-app.vercel.app/dashboard](https://conectar-app.vercel.app/dashboard)
+- [https://conectar-app-erickmarllons-projects.vercel.app/dashboard](https://conectar-app-erickmarllons-projects.vercel.app/dashboard)
+- [https://conectar-app-git-main-erickmarllons-projects.vercel.app/dashboard](https://conectar-app-git-main-erickmarllons-projects.vercel.app/dashboard)
+- [https://conectar-kyiijwg4f-erickmarllons-projects.vercel.app/](https://conectar-kyiijwg4f-erickmarllons-projects.vercel.app/)
+
+---
+
+### Back-end
+
+**Repositório do código fonte:**  
+[https://github.com/ErickMarllon/conectar-api](https://github.com/ErickMarllon/conectar-api)
+
+**API hospedada na Render:**  
+[https://conectar-api-1wos.onrender.com](https://conectar-api-1wos.onrender.com)
+
+**Documentação Swagger da API:**  
+[https://conectar-api-1wos.onrender.com/api-docs#](https://conectar-api-1wos.onrender.com/api-docs#)
 
 ---
 
