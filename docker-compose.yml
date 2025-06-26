@@ -4,7 +4,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    env_file: .env
+    env_file: .env.docker
     ports:
       - 3000:3000
     volumes:
@@ -19,9 +19,9 @@ services:
     image: postgres:16
     container_name: conectar-postgres
     environment:
-      POSTGRES_DB: conectar-company
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ${DATABASE_NAME}
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
       TZ: UTC
     volumes:
       - postgres_data:/var/lib/postgresql/data

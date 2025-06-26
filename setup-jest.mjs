@@ -9,9 +9,13 @@ process.env.APP_CORS_ORIGIN = 'http://localhost:3000,http://example.com';
 process.env.DATABASE_URL =
   'postgres://postgres:postgres@localhost:5433/conectar-company';
 process.env.DATABASE_LOGGING = 'true';
+process.env.DATABASE_NAME = 'name';
+process.env.DATABASE_USER = 'postgres';
+process.env.DATABASE_PASSWORD = 'true';
 process.env.DATABASE_MIGRATIONS_RUN = 'true';
 process.env.DATABASE_SYNCHRONIZE = 'false';
 process.env.DATABASE_MAX_CONNECTIONS = '100';
+process.env.PGADMIN_PASSWORD = 'pgadmin4';
 process.env.JWT_SECRET = 'secret';
 process.env.JWT_TOKEN_EXPIRES_IN = '1D';
 process.env.JWT_REFRESH_SECRET = 'secret_for_refresh';

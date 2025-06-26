@@ -9,7 +9,16 @@ import {
 
 export class DatabaseEnvConfigValidator {
   @IsString()
-  DATABASE_URL!: string;
+  DATABASE_URL: string;
+
+  @IsString()
+  DATABASE_NAME: string;
+
+  @IsString()
+  DATABASE_USER: string;
+
+  @IsString()
+  DATABASE_PASSWORD: string;
 
   @Transform(({ value }) => Boolean(value))
   @IsOptional()
@@ -31,4 +40,7 @@ export class DatabaseEnvConfigValidator {
   @IsNumber()
   @Min(1)
   DATABASE_MAX_CONNECTIONS: number;
+
+  @IsString()
+  PGADMIN_PASSWORD: string;
 }

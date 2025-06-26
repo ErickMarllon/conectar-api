@@ -18,7 +18,7 @@ import { DatabaseConfig } from './infrastructure/config/types/database-config.ty
     ConfigModule.forRoot({
       isGlobal: true,
       load: configurations,
-      envFilePath: ['.env.local', '.env'],
+      envFilePath: ['.env.docker', '.env'],
       cache: true,
     }),
 

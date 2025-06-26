@@ -12,6 +12,10 @@ export default registerAs<DatabaseConfig>('database', () => {
 
   return {
     url: DATABASE.DATABASE_URL,
+    name: DATABASE.DATABASE_NAME,
+    user: DATABASE.DATABASE_USER,
+    password: DATABASE.DATABASE_PASSWORD,
+    adminPassword: DATABASE.PGADMIN_PASSWORD,
     logging: DATABASE.DATABASE_LOGGING === true,
     migrationsRun: DATABASE.DATABASE_MIGRATIONS_RUN === true,
     synchronize: DATABASE.DATABASE_SYNCHRONIZE === true,
