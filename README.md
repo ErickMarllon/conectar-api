@@ -49,6 +49,13 @@ API RESTful desenvolvida em [NestJS](https://nestjs.com/) para gestão de usuár
 
 ---
 
+### Usuário de Teste (Apenas Ambiente de Homologação)
+
+- **Login:** admin@conectar.com
+- **Senha:** Admin123@
+
+---
+
 ## Rotas Principais
 
 ### Autenticação (`/api/auth`)
