@@ -79,7 +79,7 @@ const createSuccessResponse = (options: IApiOptions<Type<any>>) => {
 
 const createAuthDecorators = (
   auths: ApiAuthType[] = [ApiAuthType.JWT],
-  roles: UserRole[] = [UserRole.USER],
+  roles: UserRole[] = [],
 ) => {
   return auths.map((auth) => {
     switch (auth) {
