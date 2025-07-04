@@ -27,7 +27,7 @@ export class HealthController {
   @Get()
   @HealthCheck()
   async check(): Promise<HealthCheckResult> {
-    const appConfig = this.configService.getOrThrow<AppConfig>('AppConfig');
+    const appConfig = this.configService.getOrThrow<AppConfig>('app');
     const list = [
       () => this.db.pingCheck('database'),
       ...(appConfig.nodeEnv === Environment.DEVELOPMENT

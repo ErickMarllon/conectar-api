@@ -1,4 +1,7 @@
+import { GoogleAuthGuard } from '@/api/authentication/guard/google.auth.guard';
+import { JwtRefreshAuthGuard } from '@/api/authentication/guard/jwt-refresh.guard';
 import { JwtAuthGuard } from '@/api/authentication/guard/jwt.guard';
+import { MetaAuthGuard } from '@/api/authentication/guard/meta.auth.guard';
 import { RolesGuard } from '@/api/authentication/guard/roles.guard';
 import {
   HttpCode,
@@ -14,11 +17,10 @@ import {
   ApiOkResponse,
   ApiOperation,
   ApiResponse,
-  ApiSecurity,
 } from '@nestjs/swagger';
 import { STATUS_CODES } from 'http';
 import { ErrorDto } from '../dtos/error.dto';
-import { ApiAuthType, UserRole } from '../enums/app.enum';
+import { AuthProvider, UserRole } from '../enums/app.enum';
 import { Public } from './public.decorator';
 import { Roles } from './roles.decorator';
 import { ApiPaginatedResponse } from './swagger.decorators';
@@ -36,7 +38,7 @@ interface IApiOptions<T extends Type<any>> {
 
 type IApiPublicOptions = IApiOptions<Type<any>>;
 interface IApiAuthOptions extends IApiOptions<Type<any>> {
-  auths?: ApiAuthType[];
+  auths?: AuthProvider[];
   roles?: UserRole[];
 }
 
@@ -62,9 +64,13 @@ const createErrorResponses = (
 };
 
 const createSuccessResponse = (options: IApiOptions<Type<any>>) => {
-  const isArray = Array.isArray(options.type)[0];
+  const isArray = Array.isArray(options.type);
+  const resolvedType = isArray
+    ? (options.type as Type<any>[])[0]
+    : (options.type as Type<any>);
+
   const responseConfig = {
-    type: isArray ? isArray : options.type || Object,
+    type: resolvedType ?? Object,
     description: options?.description ?? 'OK',
   };
 
@@ -78,32 +84,37 @@ const createSuccessResponse = (options: IApiOptions<Type<any>>) => {
 };
 
 const createAuthDecorators = (
-  auths: ApiAuthType[] = [ApiAuthType.JWT],
+  auths: AuthProvider[] = [AuthProvider.JWT],
   roles: UserRole[] = [],
 ) => {
-  return auths.map((auth) => {
-    switch (auth) {
-      case ApiAuthType.BASIC:
-        return applyDecorators(
-          ApiBasicAuth(),
-          Roles(...roles),
-          UseGuards(JwtAuthGuard, RolesGuard),
-        );
-      case ApiAuthType['API-KEY']:
-        return applyDecorators(
-          ApiSecurity('Api-Key'),
-          Roles(...roles),
-          UseGuards(JwtAuthGuard, RolesGuard),
-        );
-      case ApiAuthType.JWT:
-      default:
-        return applyDecorators(
-          ApiBearerAuth(),
-          Roles(...roles),
-          UseGuards(JwtAuthGuard, RolesGuard),
-        );
-    }
-  });
+  const auth = auths[0];
+  switch (auth) {
+    case AuthProvider.GOOGLE:
+      return applyDecorators(
+        ApiBasicAuth(),
+        Roles(...roles),
+        UseGuards(GoogleAuthGuard, RolesGuard),
+      );
+    case AuthProvider.META:
+      return applyDecorators(
+        ApiBasicAuth(),
+        Roles(...roles),
+        UseGuards(MetaAuthGuard, RolesGuard),
+      );
+    case AuthProvider.JWT_REFRESH:
+      return applyDecorators(
+        ApiBearerAuth(),
+        Roles(...roles),
+        UseGuards(JwtRefreshAuthGuard, RolesGuard),
+      );
+    case AuthProvider.JWT:
+    default:
+      return applyDecorators(
+        ApiBearerAuth(),
+        Roles(...roles),
+        UseGuards(JwtAuthGuard, RolesGuard),
+      );
+  }
 };
 export const ApiPublic = (options: IApiPublicOptions = {}): MethodDecorator => {
   return applyDecorators(
@@ -120,7 +131,7 @@ export const ApiAuth = (options: IApiAuthOptions = {}): MethodDecorator => {
     ApiOperation({ summary: options?.summary }),
     HttpCode(options.statusCode || defaultStatusCode),
     createSuccessResponse(options),
-    ...createAuthDecorators(options.auths, options.roles),
+    createAuthDecorators(options.auths, options.roles),
     ...createErrorResponses(options.errorResponses),
   );
 };

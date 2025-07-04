@@ -8,7 +8,10 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { AuthenticationService } from '../authentication.service';
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy, AuthProvider.JWT) {
+export class JwtRefreshStrategy extends PassportStrategy(
+  Strategy,
+  AuthProvider.JWT_REFRESH,
+) {
   constructor(
     private authService: AuthenticationService,
     configService: ConfigService,
@@ -18,9 +21,9 @@ export class JwtStrategy extends PassportStrategy(Strategy, AuthProvider.JWT) {
       throw new Error('JWT secret not configured');
     }
     super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      jwtFromRequest: ExtractJwt.fromBodyField('refresh_token'),
       ignoreExpiration: false,
-      secretOrKey: jwtConfig.secret,
+      secretOrKey: jwtConfig.refreshSecret,
     });
   }
 

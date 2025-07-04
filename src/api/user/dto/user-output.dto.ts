@@ -1,43 +1,10 @@
+import { UserWithoutPasswordDto } from '@/shared/dtos/user-without-password-dto';
 import { ApiProperty } from '@nestjs/swagger';
 import { Exclude, Expose } from 'class-transformer';
-import { IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsDate, IsOptional, IsString } from 'class-validator';
 
 @Exclude()
-export class UserOutputDto {
-  @Expose()
-  @IsString()
-  @ApiProperty({ example: '123e4567-e89b-12d3-a456-426614174000' })
-  user_id: string;
-
-  @Expose()
-  @IsString()
-  @ApiProperty({ example: 'John' })
-  first_name: string;
-
-  @Expose()
-  @IsString()
-  @ApiProperty({ example: 'Doe' })
-  last_name: string;
-
-  @Expose()
-  @IsString()
-  @ApiProperty({ example: 'user@email.com' })
-  email: string;
-
-  @Expose()
-  @IsOptional()
-  @IsString()
-  @ApiProperty({ example: 'USER' })
-  role?: string;
-
-  @Expose()
-  @IsString()
-  @ApiProperty({
-    example: 'https://example.com/avatar.jpg',
-    description: 'URL of the user profile picture',
-  })
-  picture: string;
-
+export class UserOutputDto extends UserWithoutPasswordDto {
   @Expose()
   @IsString()
   @ApiProperty({
@@ -57,11 +24,10 @@ export class UserOutputDto {
 
   @Expose()
   @IsOptional()
-  @IsNumber()
+  @IsDate()
   @ApiProperty({
-    example: 1718882400000,
+    example: new Date(),
     description: 'Access token expiration timestamp (in milliseconds)',
   })
-  //corrigir depois
-  token_expires?: number | string | null;
+  token_expires?: Date | null;
 }

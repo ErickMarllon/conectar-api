@@ -3,10 +3,9 @@ import { AuthProvider } from '@/shared/enums/app.enum';
 import { ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { AuthGuard } from '@nestjs/passport';
-import { Request } from 'express';
 
 @Injectable()
-export class JwtAuthGuard extends AuthGuard(AuthProvider.JWT) {
+export class JwtRefreshAuthGuard extends AuthGuard(AuthProvider.JWT_REFRESH) {
   constructor(private reflector: Reflector) {
     super();
   }
@@ -18,13 +17,6 @@ export class JwtAuthGuard extends AuthGuard(AuthProvider.JWT) {
     ]);
 
     if (isPublic) {
-      return true;
-    }
-
-    const request = context.switchToHttp().getRequest<Request>();
-    const isRefreshUrl = request.url.includes('refresh');
-
-    if (isRefreshUrl) {
       return true;
     }
 

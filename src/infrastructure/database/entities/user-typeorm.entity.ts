@@ -5,7 +5,6 @@ import {
   BeforeInsert,
   BeforeUpdate,
   Column,
-  DeleteDateColumn,
   Entity,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -49,12 +48,11 @@ export class User extends AbstractEntity {
   })
   last_login_at: Date;
 
-  @DeleteDateColumn({
-    name: 'deleted_at',
-    type: 'timestamptz',
-    default: null,
+  @Column({
+    name: 'is_blocked',
+    default: false,
   })
-  deleted_at: Date;
+  is_blocked: boolean;
 
   @OneToOne(() => Session, (session) => session.user)
   session: Session;

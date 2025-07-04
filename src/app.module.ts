@@ -9,7 +9,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ApiModule } from './api/api.module';
 import { JwtAuthGuard } from './api/authentication/guard/jwt.guard';
 import { RolesGuard } from './api/authentication/guard/roles.guard';
-import { configurations } from './infrastructure/config/config';
+import appConfig from './infrastructure/config/app.config';
+import authConfig from './infrastructure/config/auth.config';
+import databaseConfig from './infrastructure/config/database.config';
+import googleConfig from './infrastructure/config/google.config';
+import jwtConfig from './infrastructure/config/jwt.config';
+import metaConfig from './infrastructure/config/meta.config';
 import { DatabaseConfig } from './infrastructure/config/types/database-config.type';
 
 @Module({
@@ -17,7 +22,14 @@ import { DatabaseConfig } from './infrastructure/config/types/database-config.ty
     PassportModule,
     ConfigModule.forRoot({
       isGlobal: true,
-      load: configurations,
+      load: [
+        databaseConfig,
+        jwtConfig,
+        appConfig,
+        authConfig,
+        googleConfig,
+        metaConfig,
+      ],
       envFilePath: ['.env.docker', '.env'],
       cache: true,
     }),
@@ -32,6 +44,7 @@ import { DatabaseConfig } from './infrastructure/config/types/database-config.ty
           type: 'postgres',
           url: dbConfig.url,
           entities: [Session, User],
+          ssl: { rejectUnauthorized: false },
         };
       },
     }),
@@ -46,6 +59,7 @@ import { DatabaseConfig } from './infrastructure/config/types/database-config.ty
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
     },
+
     {
       provide: APP_GUARD,
       useClass: RolesGuard,

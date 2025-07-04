@@ -10,5 +10,13 @@ export class OAuthUserDTO {
 export class findOrCreateInputDTO extends OAuthUserDTO {
   password?: string;
 }
-export type UserPayload = Pick<User, 'id' | 'email' | 'role'>;
 export type UserSignInDTO = Pick<User, 'email' | 'password'>;
+
+export interface JwtPayload {
+  sub: {
+    id: string;
+    email: string;
+    role: string;
+    type: 'access' | 'refresh';
+  };
+}

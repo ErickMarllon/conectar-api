@@ -1,6 +1,7 @@
-import { User } from '@/database/entities/user-typeorm.entity';
 import { CurrentUser } from '@/shared/decorators/current-user.decorator';
 import { ApiAuth, ApiPublic } from '@/shared/decorators/http.decorators';
+import { UserDto } from '@/shared/dtos/user.dto ';
+import { AuthProvider } from '@/shared/enums/app.enum';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import {
   Body,
@@ -18,19 +19,25 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { ApiTags } from '@nestjs/swagger';
 import { Cache } from 'cache-manager';
+import { plainToInstance } from 'class-transformer';
+import { IsString } from 'class-validator';
 import { v4 as uuidv4 } from 'uuid';
 import { UserAccessTokenDto } from '../user/dto/user-output-token.dto';
 import { UserOutputDto } from '../user/dto/user-output.dto';
-import { UserPayload } from '../user/user.dto';
-import { AuthenticationService, Token } from './authentication.service';
+import { JwtPayload } from '../user/user.dto';
+import { AuthenticationService } from './authentication.service';
 import { LoginReqDto } from './dto/login.req.dto';
-import { RefreshReqDto } from './dto/refresh.req.dto';
 import { RegisterReqDto } from './dto/register.req.dto';
 import { CaptureRedirectGuard } from './guard/capture-redirect.guard';
 import { CsrfStateGenerateGuard } from './guard/csrf-state-generate.guard';
 import { CsrfStateGuard } from './guard/csrf-state.guard';
 import { GoogleAuthGuard } from './guard/google.auth.guard';
+import { MetaAuthGuard } from './guard/meta.auth.guard';
 
+export class Token {
+  @IsString()
+  refresh_token: string;
+}
 @ApiTags('auth')
 @Controller('auth')
 export class AuthenticationController {
@@ -59,22 +66,17 @@ export class AuthenticationController {
     if (!access_token) {
       throw new NotFoundException('Invalid code');
     }
-    const decoded = this.jwtService.decode(access_token) as UserPayload;
+    const decoded = this.jwtService.decode(access_token) as JwtPayload;
     const session = await this.authenticationService.findSessionByUserId(
-      decoded.id,
+      decoded.sub.id,
     );
     await this.cacheManager.del(code);
 
-    return {
-      user_id: session?.user_id,
-      first_name: session?.user?.first_name,
-      last_name: session?.user?.last_name,
-      email: session?.user?.email,
-      picture: session?.user?.picture,
-      access_token: session?.access_token,
-      refresh_token: session?.refresh_token,
-      role: session?.user?.role,
-    };
+    return plainToInstance(UserOutputDto, {
+      ...session.user,
+      access_token: session.access_token,
+      refresh_token: session.refresh_token,
+    });
   }
 
   @Get('google')
@@ -98,15 +100,26 @@ export class AuthenticationController {
   @Redirect()
   async googleAuthCallback(
     @Session() session: { redirectUrl?: string },
-    @CurrentUser() user: User,
+    @CurrentUser() currentUser: UserDto,
   ) {
-    const code = uuidv4();
-    const payload = { id: user.id, email: user.email, role: user.role };
-    const token = await this.jwtService.signAsync(payload);
+    if (!currentUser) {
+      return {
+        url: `${this.frontendUrl}/auth/notfound`,
+        statusCode: HttpStatus.MOVED_PERMANENTLY,
+      };
+    }
 
+    const code = uuidv4();
+
+    const { access_token } =
+      await this.authenticationService.generateAuthTokens(
+        currentUser.id,
+        currentUser.email,
+        currentUser.role,
+      );
     const redirectUrl = session?.redirectUrl || '/';
 
-    await this.cacheManager.set(code, token, 60 * 60 * 24);
+    await this.cacheManager.set(code, access_token, 60 * 60 * 24);
 
     return {
       url: `${this.frontendUrl}/auth/callback?code=${code}&redirect_url=${redirectUrl}`,
@@ -114,24 +127,50 @@ export class AuthenticationController {
     };
   }
 
-  @Get('me')
-  @ApiAuth({
-    summary: 'Sign in with email and password',
+  @Get('meta')
+  @ApiPublic({
+    summary: 'Meta OAuth sign-in',
     description:
-      'Sign in using email and password to get user profile and tokens',
-    statusCode: HttpStatus.OK,
-    type: UserOutputDto,
+      'This endpoint initiates the Meta OAuth flow. It redirects the user to Meta for authentication.',
+    statusCode: HttpStatus.PERMANENT_REDIRECT,
   })
-  async getMe(@CurrentUser() user: UserOutputDto): Promise<UserOutputDto> {
+  @UseGuards(CaptureRedirectGuard, CsrfStateGenerateGuard, MetaAuthGuard)
+  signInWithMeta() {}
+
+  @Get('meta/callback')
+  @ApiPublic({
+    summary: 'Meta OAuth callback',
+    description:
+      'This endpoint is called after Meta OAuth flow is completed. It exchanges the Meta user information for a session token.',
+    statusCode: HttpStatus.PERMANENT_REDIRECT,
+  })
+  @UseGuards(MetaAuthGuard, CsrfStateGuard)
+  @Redirect()
+  async metauthCallback(
+    @Session() session: { redirectUrl?: string },
+    @CurrentUser() currentUser: UserDto,
+  ) {
+    if (!currentUser) {
+      return {
+        url: `${this.frontendUrl}/auth/notfound`,
+        statusCode: HttpStatus.MOVED_PERMANENTLY,
+      };
+    }
+
+    const code = uuidv4();
+    const { access_token } =
+      await this.authenticationService.generateAuthTokens(
+        currentUser.id,
+        currentUser.email,
+        currentUser.role,
+      );
+    const redirectUrl = session?.redirectUrl || '/';
+
+    await this.cacheManager.set(code, access_token, 60 * 60 * 24);
+
     return {
-      user_id: user?.user_id,
-      first_name: user?.first_name,
-      last_name: user?.last_name,
-      email: user?.email,
-      picture: user?.picture,
-      access_token: user?.access_token,
-      refresh_token: user?.refresh_token,
-      role: user?.role,
+      url: `${this.frontendUrl}/auth/callback?code=${code}&redirect_url=${redirectUrl}`,
+      statusCode: HttpStatus.MOVED_PERMANENTLY,
     };
   }
 
@@ -158,9 +197,27 @@ export class AuthenticationController {
     return await this.authenticationService.signUp(input);
   }
 
-  @ApiPublic()
   @Post('refresh')
-  async refresh(@Body() dto: RefreshReqDto): Promise<Token> {
-    return await this.authenticationService.refreshToken(dto);
+  @ApiAuth({
+    auths: [AuthProvider.JWT_REFRESH],
+    summary: 'Refresh access token',
+    description: 'Refresh the access token using a valid refresh token',
+    statusCode: HttpStatus.OK,
+    type: UserOutputDto,
+  })
+  async refresh(@Body() input: Token) {
+    return await this.authenticationService.refreshToken(input.refresh_token);
+  }
+
+  @Post('logout')
+  @ApiAuth({
+    summary: 'Logout user',
+    description: 'Logout the authenticated user and invalidate their session',
+    statusCode: HttpStatus.OK,
+    type: String,
+  })
+  async logout(@CurrentUser() currentUser: UserDto) {
+    await this.authenticationService.logout(currentUser.id);
+    return { message: 'Successfully logged out' };
   }
 }

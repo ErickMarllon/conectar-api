@@ -27,7 +27,11 @@ export class GoogleStrategy extends PassportStrategy(
     });
   }
 
-  validate(access_token: string, refresh_token: string, profile: Profile) {
+  async validate(
+    access_token: string,
+    refresh_token: string,
+    profile: Profile,
+  ) {
     const {
       sub: id,
       given_name: first_name,
@@ -47,8 +51,12 @@ export class GoogleStrategy extends PassportStrategy(
     userDto.email = email || '';
     userDto.first_name = first_name || '';
     userDto.last_name = last_name;
-    userDto.picture = picture || '';
+    userDto.picture = this.getHighResGooglePhoto(picture);
 
-    return this.authenticationService.validateOAuthUser(authDto, userDto);
+    return await this.authenticationService.validateOAuthUser(authDto, userDto);
+  }
+  private getHighResGooglePhoto(pictureUrl?: string): string {
+    if (!pictureUrl) return '';
+    return pictureUrl.replace(/=s\d+-c$/, '=s512-c');
   }
 }

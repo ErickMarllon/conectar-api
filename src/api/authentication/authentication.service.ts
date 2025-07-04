@@ -1,10 +1,12 @@
 import { Session } from '@/database/entities/session-typeorm.entity';
-import { AuthProvider, UserRole } from '@/shared/enums/app.enum';
+import { UserWithoutPasswordDto } from '@/shared/dtos/user-without-password-dto';
+import { AccessTypes, AuthProvider, UserRole } from '@/shared/enums/app.enum';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import {
   ConflictException,
   Inject,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -16,12 +18,11 @@ import ms, { StringValue } from 'ms';
 import { JwtConfig } from 'src/infrastructure/config/types/jwt-config.type';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
-import { OAuthUserDTO } from '../user/user.dto';
+import { UserOutputDto } from '../user/dto/user-output.dto';
+import { JwtPayload, OAuthUserDTO } from '../user/user.dto';
 import { UsersService } from '../user/users.service';
 import { OAuthDTO } from './dto/auth.dto';
 import { LoginReqDto } from './dto/login.req.dto';
-import { LoginResDto } from './dto/login.res.dto';
-import { RefreshReqDto } from './dto/refresh.req.dto';
 import { RegisterReqDto } from './dto/register.req.dto';
 
 export type Token = {
@@ -52,152 +53,252 @@ export class AuthenticationService {
     this.refreshExpires = jwtConfig.refreshExpiresIn;
   }
 
-  async validateOAuthUser(authDTO: OAuthDTO, userDTO: OAuthUserDTO) {
-    const existingSession = await this.findSession(
-      authDTO.source,
-      authDTO.source_id,
+  async signIn(input: LoginReqDto): Promise<UserOutputDto> {
+    const user = await this.userService.validateCredentials(input);
+    const tokens = await this.generateAuthTokens(
+      user.id,
+      user.email,
+      user.role,
     );
 
-    if (existingSession && existingSession.user) {
-      return await this.updateOAuthUser(existingSession);
-    }
-
-    const user = await this.userService.findOrCreate(userDTO);
-
-    const session = await this.createSession(user.id, {
-      ...authDTO,
+    const session = await this.sessionRepository.findOne({
+      where: { user_id: user.id },
     });
+    const sessionData = {
+      access_token: tokens.access_token,
+      refresh_token: tokens.refresh_token,
+      source: AuthProvider.JWT,
+      expires: this.parseExpiration(tokens.expires),
+    };
 
-    return plainToInstance(LoginResDto, {
-      access_token: session.access_token,
-      refresh_token: session.refresh_token,
-    });
-  }
-
-  async signIn(input: LoginReqDto) {
-    const user = await this.userService.validateCredentials(input);
-    const token = await this.generateAuthTokens(user.id, user.email, user.role);
-
-    let session = await this.findSessionByUserId(user.id);
     if (session) {
-      await this.updateSession(session.id, {
-        ...token,
-        expires: this.parseExpiration(token.expires),
-      });
+      await this.sessionRepository.update(session.id, sessionData);
     } else {
-      session = await this.createSession(user.id, {
-        ...token,
-        expires: this.parseExpiration(token.expires),
-        source: AuthProvider.JWT,
+      await this.createSession(user.id, {
+        ...sessionData,
         source_id: uuidv4(),
       });
     }
 
-    return plainToInstance(LoginResDto, {
-      ...user,
-      access_token: session.access_token,
-      refresh_token: session.refresh_token,
-    });
+    await this.userService.updateLastLogin(user.id);
+
+    return plainToInstance(
+      UserOutputDto,
+      {
+        ...user,
+        ...tokens,
+      },
+      { excludeExtraneousValues: true },
+    );
   }
 
   async signUp(input: RegisterReqDto) {
-    const userExist = await this.userService.findByEmail(input.email);
-    if (userExist) {
+    const existingUser = await this.userService.findByEmail(input.email);
+    if (existingUser)
       throw new ConflictException('User already exists with this email');
-    }
-    const user = await this.userService.create(input);
 
-    const token = await this.generateAuthTokens(user.id, user.email);
-    const session = await this.createSession(user.id, {
-      ...token,
-      expires: this.parseExpiration(token.expires),
+    const user = await this.userService.create(input);
+    const tokens = await this.generateAuthTokens(
+      user.id,
+      user.email,
+      user.role,
+    );
+
+    await this.createSession(user.id, {
+      ...tokens,
+      expires: this.parseExpiration(tokens.expires),
       source: AuthProvider.JWT,
       source_id: uuidv4(),
     });
 
-    return plainToInstance(LoginResDto, {
+    await this.userService.updateLastLogin(user.id);
+
+    return plainToInstance(UserOutputDto, {
       ...user,
+      ...tokens,
+    });
+  }
+
+  async validateOAuthUser(authDTO: OAuthDTO, userDTO: OAuthUserDTO) {
+    const existingSession = await this.findSession(authDTO.source_id);
+
+    if (existingSession?.user && authDTO?.source) {
+      existingSession.source = authDTO.source as string;
+      const { user } = existingSession;
+      const userUpdate = {
+        id: user.id,
+        ...userDTO,
+      };
+      const sessionUpdated = await this.updateOAuthUser(
+        existingSession,
+        userUpdate,
+      );
+
+      if (!sessionUpdated) {
+        throw new NotFoundException('Session could not be updated');
+      }
+      await this.userService.updateLastLogin(sessionUpdated?.user_id as string);
+
+      return plainToInstance(UserOutputDto, {
+        ...sessionUpdated.user,
+        access_token: sessionUpdated.access_token,
+        refresh_token: sessionUpdated.refresh_token,
+      });
+    }
+    const user = await this.userService.findOrCreate(userDTO);
+    const { access_token, refresh_token } = await this.createSession(
+      user.id,
+      authDTO,
+    );
+    await this.userService.updateLastLogin(user.id);
+
+    return plainToInstance(UserOutputDto, {
+      ...user,
+      access_token,
+      refresh_token,
+    });
+  }
+
+  async refreshToken(refreshToken: string): Promise<any> {
+    const payload = await this.jwtService.verifyAsync<JwtPayload>(
+      refreshToken,
+      { secret: this.refreshSecret },
+    );
+
+    const requiredFields = ['id', 'email', 'role', 'type'];
+    const missingField = requiredFields.find((field) => !payload?.sub?.[field]);
+
+    if (missingField) {
+      throw new UnauthorizedException(
+        `Invalid token payload: missing "${missingField}" in validateAccessToken`,
+      );
+    }
+
+    if (payload?.sub?.type !== AccessTypes.REFRESH) {
+      throw new UnauthorizedException('Invalid token type');
+    }
+
+    const session = await this.findSessionByUserId(payload.sub.id);
+
+    const tokens = await this.generateAuthTokens(
+      session.user.id,
+      session.user.email,
+      session.user.role,
+    );
+
+    await this.sessionRepository.update(session.id, {
+      access_token: tokens.access_token,
+      refresh_token: tokens.refresh_token,
+      expires: tokens.expires,
+    });
+
+    return tokens;
+  }
+
+  public async findSessionByUserId(user_id: string) {
+    const session = await this.sessionRepository.findOne({
+      where: { user_id },
+      relations: ['user'],
+    });
+    if (!session || !session.user)
+      throw new NotFoundException('Session not found');
+    return session;
+  }
+
+  async logout(user_id: string): Promise<void> {
+    const session = await this.findSessionByUserId(user_id);
+    if (!session) throw new NotFoundException('Session not found');
+    await this.sessionRepository.delete(session.id);
+  }
+
+  private async updateOAuthUser(
+    session: Session,
+    user: Partial<UserWithoutPasswordDto>,
+  ) {
+    const tokens = await this.generateAuthTokens(
+      session.user.id,
+      session.user.email,
+      session.user.role,
+    );
+
+    await this.sessionRepository.update(session.id, {
+      ...tokens,
+      source: session.source,
+      source_id: session.source_id,
+      expires: this.parseExpiration(tokens.expires),
+    });
+    if (user && user.id) {
+      await this.userService.updateUser(user.id, user);
+    }
+
+    return await this.findSession(session.source_id);
+  }
+
+  async validateAccessToken(payload: JwtPayload): Promise<UserOutputDto> {
+    const requiredFields = ['id', 'email', 'role', 'type'];
+    const missing = requiredFields.find((f) => !payload?.sub?.[f]);
+    if (missing) throw new UnauthorizedException(`Missing field: ${missing}`);
+
+    if (payload.sub.type !== AccessTypes[payload.sub.type.toUpperCase()]) {
+      throw new UnauthorizedException('Invalid token type');
+    }
+
+    const session = await this.findSessionByUserId(payload.sub.id);
+
+    return plainToInstance(UserOutputDto, {
+      ...session.user,
       access_token: session.access_token,
       refresh_token: session.refresh_token,
     });
   }
 
-  async findSessionByUserId(user_id: string) {
-    return this.sessionRepository.findOne({
-      where: { user_id },
-      relations: ['user'],
-    });
-  }
-
-  async refreshToken(dto: RefreshReqDto): Promise<Token> {
-    const { source_id } = await this.verifyToken<Partial<Session>>(
-      dto.refreshToken,
-      this.refreshSecret,
-    );
-    if (!source_id) {
-      throw new UnauthorizedException('Invalid refresh token');
+  async validateToken(token: string, secret: string, type: AccessTypes) {
+    if (type !== AccessTypes.REFRESH) {
+      throw new UnauthorizedException('Invalid token type');
     }
-    const session = await this.validateSession(source_id);
 
-    await this.sessionRepository.update(session.id, session);
-    return this.generateAuthTokens(
-      session.user_id,
-      session.user.email,
-      session.user.role,
-    );
-  }
-
-  private async updateOAuthUser(existingSession: Session) {
-    const tokens = await this.generateAuthTokens(
-      existingSession.user.id,
-      existingSession.user.email,
-      existingSession.user.role,
-    );
-
-    await this.updateSession(existingSession.id, {
-      access_token: tokens.access_token,
-      refresh_token: tokens.refresh_token,
-      expires: this.parseExpiration(tokens.expires),
+    const payload = await this.jwtService.verifyAsync<JwtPayload>(token, {
+      secret,
     });
-    return existingSession.user;
+    const requiredFields = ['id', 'email', 'role', 'type'];
+    const missing = requiredFields.find((f) => !payload?.sub?.[f]);
+    if (missing) throw new UnauthorizedException(`Missing field: ${missing}`);
+
+    const session = await this.findSessionByUserId(payload.sub.id);
+
+    return plainToInstance(UserOutputDto, {
+      ...session.user,
+      access_token: session.access_token,
+      refresh_token: session.refresh_token,
+    });
   }
 
   private parseExpiration(exp?: unknown): Date {
     if (exp instanceof Date) return exp;
     if (typeof exp === 'number') return new Date(exp);
     if (typeof exp === 'string') return new Date(exp);
-
     return new Date(Date.now() + ms(this.refreshExpires as StringValue));
   }
 
-  private async generateAuthTokens(
+  async generateAuthTokens(
     id: string,
     email: string,
-    role?: UserRole,
+    role = UserRole.USER,
   ): Promise<Token> {
-    const tokenExpires = this.parseExpiration();
-    const userRole = role ?? UserRole.USER;
+    const expires = this.parseExpiration();
+    const payload = { id, email, role };
 
     const [access_token, refresh_token] = await Promise.all([
-      await this.jwtService.signAsync(
-        {
-          id: id,
-          role: userRole,
-          email: email,
-        },
+      this.jwtService.signAsync(
+        { sub: { ...payload, type: AccessTypes.ACCESS } },
         {
           secret: this.tokenSecret,
           expiresIn: this.tokenExpiresIn,
           algorithm: 'HS256',
         },
       ),
-
-      await this.jwtService.signAsync(
-        {
-          id: id,
-          role: userRole,
-          email: email,
-        },
+      this.jwtService.signAsync(
+        { sub: { ...payload, type: AccessTypes.REFRESH } },
         {
           secret: this.refreshSecret,
           expiresIn: this.refreshExpires,
@@ -205,49 +306,22 @@ export class AuthenticationService {
         },
       ),
     ]);
-    return {
-      access_token,
-      refresh_token,
-      expires: tokenExpires,
-    };
+
+    return { access_token, refresh_token, expires };
   }
 
-  private findSession(source: string, source_id: string) {
+  private findSession(source_id: string): Promise<Session | null> {
     return this.sessionRepository.findOne({
       where: { source_id },
       relations: ['user'],
     });
   }
 
-  private updateSession(id: string, data: Partial<Session>) {
-    return this.sessionRepository.update(id, data);
-  }
-
-  private createSession(user_id: string, authDTO: OAuthDTO) {
+  private createSession(id: string, authDTO: OAuthDTO) {
     const session = this.sessionRepository.create({
       ...authDTO,
-      user_id,
+      user_id: id,
     });
     return this.sessionRepository.save(session);
-  }
-
-  private async verifyToken<T extends object>(
-    token: string,
-    secret: string,
-  ): Promise<T> {
-    try {
-      return await this.jwtService.verify<T>(token, { secret });
-    } catch {
-      throw new UnauthorizedException('Invalid token');
-    }
-  }
-
-  private async validateSession(sessionId: string): Promise<Session> {
-    const session = await this.sessionRepository.findOneBy({
-      id: sessionId,
-    });
-    if (!session || session.id !== sessionId)
-      throw new UnauthorizedException('Invalid session');
-    return session;
   }
 }

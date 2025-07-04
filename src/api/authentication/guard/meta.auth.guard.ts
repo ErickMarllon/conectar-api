@@ -5,14 +5,12 @@ import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
 
 @Injectable()
-export class GoogleAuthGuard extends AuthGuard(AuthProvider.GOOGLE) {
+export class MetaAuthGuard extends AuthGuard(AuthProvider.META) {
   getAuthenticateOptions(context: ExecutionContext) {
     const req = context.switchToHttp().getRequest<Request>();
     const state = <string>req.session.state;
 
-    return {
-      state,
-    };
+    return { state };
   }
 
   handleRequest(err: any, user: UserDto) {

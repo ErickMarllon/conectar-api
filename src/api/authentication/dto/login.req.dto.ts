@@ -1,15 +1,4 @@
-import { StrongPasswordField } from '@/shared/decorators/field.decorators';
-import { ApiProperty } from '@nestjs/swagger';
-import { Transform } from 'class-transformer';
-import { IsEmail } from 'class-validator';
+import { UserDto } from '@/shared/dtos/user.dto ';
+import { PickType } from '@nestjs/swagger';
 
-export class LoginReqDto {
-  @ApiProperty({ example: 'user@email.com' })
-  @Transform(({ value }) => value.toLowerCase())
-  @IsEmail()
-  email: string;
-
-  @ApiProperty({ example: '123456aA@' })
-  @StrongPasswordField()
-  password: string;
-}
+export class LoginReqDto extends PickType(UserDto, ['email', 'password']) {}

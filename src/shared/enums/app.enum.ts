@@ -6,11 +6,6 @@ export enum Environment {
   TEST = 'test',
 }
 
-export enum AuthProvider {
-  GOOGLE = 'GOOGLE',
-  JWT = 'jwt',
-}
-
 export enum Order {
   ASC = 'ASC',
   DESC = 'DESC',
@@ -31,8 +26,13 @@ export enum UserRole {
   USER = 'USER',
 }
 
-export enum ApiAuthType {
-  BASIC = 'basic',
-  'API-KEY' = 'api_key',
+export enum AuthProvider {
+  GOOGLE = 'google',
+  META = 'meta',
   JWT = 'jwt',
+  JWT_REFRESH = 'jwt-refresh',
+}
+export enum AccessTypes {
+  ACCESS = 'access',
+  REFRESH = 'refresh',
 }

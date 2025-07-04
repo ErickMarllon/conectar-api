@@ -10,6 +10,7 @@ export const AppDataSource = new DataSource({
   migrations: [__dirname + '/migrations/**/*{.ts,.js}'],
   migrationsTableName: 'migrations',
   seeds: [__dirname + '/seeds/**/*{.ts,.js}'],
+  ssl: { rejectUnauthorized: false },
   seedTracking: true,
   factories: [__dirname + '/factories/**/*{.ts,.js}'],
 } as DataSourceOptions & SeederOptions);
