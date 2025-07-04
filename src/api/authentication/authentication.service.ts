@@ -1,5 +1,4 @@
 import { Session } from '@/database/entities/session-typeorm.entity';
-import { UserWithoutPasswordDto } from '@/shared/dtos/user-without-password-dto';
 import { AccessTypes, AuthProvider, UserRole } from '@/shared/enums/app.enum';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import {
@@ -19,10 +18,12 @@ import { JwtConfig } from 'src/infrastructure/config/types/jwt-config.type';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 import { UserOutputDto } from '../user/dto/user-output.dto';
-import { JwtPayload, OAuthUserDTO } from '../user/user.dto';
+import { UserWithoutPasswordDto } from '../user/dto/user-without-password-dto';
 import { UsersService } from '../user/users.service';
-import { OAuthDTO } from './dto/auth.dto';
+import { IJwtPayload } from './dto/Ijwt-payload.dto';
 import { LoginReqDto } from './dto/login.req.dto';
+import { OAuthUserDTO } from './dto/oauth-user.dto';
+import { OAuthDTO } from './dto/oauth.dto';
 import { RegisterReqDto } from './dto/register.req.dto';
 
 export type Token = {
@@ -93,7 +94,9 @@ export class AuthenticationService {
   }
 
   async signUp(input: RegisterReqDto) {
-    const existingUser = await this.userService.findByEmail(input.email);
+    const existingUser = await this.userService.findOneBy({
+      email: input.email,
+    });
     if (existingUser)
       throw new ConflictException('User already exists with this email');
 
@@ -160,7 +163,7 @@ export class AuthenticationService {
   }
 
   async refreshToken(refreshToken: string): Promise<any> {
-    const payload = await this.jwtService.verifyAsync<JwtPayload>(
+    const payload = await this.jwtService.verifyAsync<IJwtPayload>(
       refreshToken,
       { secret: this.refreshSecret },
     );
@@ -227,6 +230,7 @@ export class AuthenticationService {
       source_id: session.source_id,
       expires: this.parseExpiration(tokens.expires),
     });
+
     if (user && user.id) {
       await this.userService.updateUser(user.id, user);
     }
@@ -234,7 +238,7 @@ export class AuthenticationService {
     return await this.findSession(session.source_id);
   }
 
-  async validateAccessToken(payload: JwtPayload): Promise<UserOutputDto> {
+  async validateAccessToken(payload: IJwtPayload): Promise<UserOutputDto> {
     const requiredFields = ['id', 'email', 'role', 'type'];
     const missing = requiredFields.find((f) => !payload?.sub?.[f]);
     if (missing) throw new UnauthorizedException(`Missing field: ${missing}`);
@@ -257,7 +261,7 @@ export class AuthenticationService {
       throw new UnauthorizedException('Invalid token type');
     }
 
-    const payload = await this.jwtService.verifyAsync<JwtPayload>(token, {
+    const payload = await this.jwtService.verifyAsync<IJwtPayload>(token, {
       secret,
     });
     const requiredFields = ['id', 'email', 'role', 'type'];

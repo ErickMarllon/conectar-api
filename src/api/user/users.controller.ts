@@ -14,17 +14,16 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
-import { User } from '@/database/entities/user-typeorm.entity';
 import { CurrentUser } from '@/shared/decorators/current-user.decorator';
 import { ApiAuth } from '@/shared/decorators/http.decorators';
 import { QueryDto } from '@/shared/dtos/query.dto';
-import { UserDto } from '@/shared/dtos/user.dto ';
 import { UserRole } from '@/shared/enums/app.enum';
 import { plainToInstance } from 'class-transformer';
 import { CreateUserDto } from './dto/create-user.dto';
 import { QueryUserDto } from './dto/query-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserOutputDto } from './dto/user-output.dto';
+import { UserWithoutPasswordDto } from './dto/user-without-password-dto';
 import { UsersService } from './users.service';
 
 @ApiTags('users')
@@ -39,7 +38,7 @@ export class UsersController {
     summary: 'Create a new user (Admin only)',
     description:
       'This endpoint allows an admin to create a new user. The password will be hashed before saving.',
-    type: User,
+    type: UserOutputDto,
     roles: [UserRole.ADMIN],
     statusCode: HttpStatus.CREATED,
   })
@@ -54,7 +53,9 @@ export class UsersController {
     statusCode: HttpStatus.OK,
     type: UserOutputDto,
   })
-  async getMe(@CurrentUser() currentUser: UserDto): Promise<UserOutputDto> {
+  async getMe(
+    @CurrentUser() currentUser: UserOutputDto,
+  ): Promise<UserOutputDto> {
     return plainToInstance(UserOutputDto, currentUser, {
       excludeExtraneousValues: true,
     });
@@ -63,7 +64,7 @@ export class UsersController {
   @ApiAuth({
     summary: 'Get all users (Admin only)',
     description: 'Retrieves all users with pagination and filtering.',
-    type: [User],
+    type: [UserOutputDto],
     roles: [UserRole.ADMIN],
     isPaginated: true,
     statusCode: HttpStatus.OK,
@@ -76,7 +77,7 @@ export class UsersController {
   @ApiAuth({
     summary: 'Search users (Admin only)',
     description: 'Allows admin to search users.',
-    type: [User],
+    type: [UserOutputDto],
     roles: [UserRole.ADMIN],
     isPaginated: true,
     statusCode: HttpStatus.OK,
@@ -89,7 +90,7 @@ export class UsersController {
   @ApiAuth({
     summary: 'Get inactive users (Admin only)',
     description: 'Retrieves users inactive for 30+ days.',
-    type: [User],
+    type: [UserOutputDto],
     roles: [UserRole.ADMIN],
     // isPaginated: true,
     statusCode: HttpStatus.OK,
@@ -102,29 +103,35 @@ export class UsersController {
   @ApiAuth({
     summary: 'Get user by ID',
     description: 'Retrieve a user by ID.',
-    type: User,
+    type: UserOutputDto,
     roles: [UserRole.ADMIN],
     statusCode: HttpStatus.OK,
   })
-  findOne(@Param('id') id: string, @CurrentUser() currentUser: User) {
+  async findOne(
+    @Param('id') id: string,
+    @CurrentUser() currentUser: UserOutputDto,
+  ) {
     if (currentUser.role !== UserRole.ADMIN && currentUser.id !== id) {
       throw new ForbiddenException('You can only access your own user data');
     }
-    return this.usersService.findByID(id);
+    const user = await this.usersService.findOneBy({ id });
+    return plainToInstance(UserWithoutPasswordDto, user, {
+      excludeExtraneousValues: true,
+    });
   }
 
   @Patch(':id')
   @ApiAuth({
     summary: 'Update user by ID',
     description: 'Update user data.',
-    type: User,
+    type: UserOutputDto,
     roles: [UserRole.ADMIN, UserRole.USER],
     statusCode: HttpStatus.OK,
   })
   update(
     @Param('id') id: string,
     @Body() input: UpdateUserDto,
-    @CurrentUser() currentUser: UserDto,
+    @CurrentUser() currentUser: UserOutputDto,
   ) {
     if (currentUser.role !== UserRole.ADMIN || currentUser.id !== id) {
       throw new ForbiddenException('You can only update your own user data');

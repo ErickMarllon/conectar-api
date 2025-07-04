@@ -1,7 +1,7 @@
-import { UserWithoutPasswordDto } from '@/shared/dtos/user-without-password-dto';
 import { ApiProperty } from '@nestjs/swagger';
 import { Exclude, Expose } from 'class-transformer';
 import { IsDate, IsOptional, IsString } from 'class-validator';
+import { UserWithoutPasswordDto } from './user-without-password-dto';
 
 @Exclude()
 export class UserOutputDto extends UserWithoutPasswordDto {

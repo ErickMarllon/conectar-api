@@ -15,5 +15,10 @@ export default setSeederFactory(User, async (fake) => {
   user.picture = fake.image.avatar();
   user.role = fake.helpers.arrayElement([UserRole.ADMIN, UserRole.USER]);
   user.last_login_at = fake.date.recent({ days: 40 });
+  user.country_code = '55';
+  user.area_code = fake.string.numeric(2);
+  user.phone = '9' + fake.string.numeric(8);
+  user.whatsapp = `${user.country_code}${user.area_code}${user.phone}`;
+  user.cpf = fake.string.numeric(11);
   return user;
 });

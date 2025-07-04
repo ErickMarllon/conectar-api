@@ -1,6 +1,5 @@
 import { CurrentUser } from '@/shared/decorators/current-user.decorator';
 import { ApiAuth, ApiPublic } from '@/shared/decorators/http.decorators';
-import { UserDto } from '@/shared/dtos/user.dto ';
 import { AuthProvider } from '@/shared/enums/app.enum';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import {
@@ -20,24 +19,21 @@ import { JwtService } from '@nestjs/jwt';
 import { ApiTags } from '@nestjs/swagger';
 import { Cache } from 'cache-manager';
 import { plainToInstance } from 'class-transformer';
-import { IsString } from 'class-validator';
 import { v4 as uuidv4 } from 'uuid';
 import { UserAccessTokenDto } from '../user/dto/user-output-token.dto';
 import { UserOutputDto } from '../user/dto/user-output.dto';
-import { JwtPayload } from '../user/user.dto';
+import { UserDto } from '../user/dto/user.dto ';
 import { AuthenticationService } from './authentication.service';
+import { IJwtPayload } from './dto/Ijwt-payload.dto';
 import { LoginReqDto } from './dto/login.req.dto';
 import { RegisterReqDto } from './dto/register.req.dto';
+import { TokenReqDto } from './dto/token.dto';
 import { CaptureRedirectGuard } from './guard/capture-redirect.guard';
 import { CsrfStateGenerateGuard } from './guard/csrf-state-generate.guard';
 import { CsrfStateGuard } from './guard/csrf-state.guard';
 import { GoogleAuthGuard } from './guard/google.auth.guard';
 import { MetaAuthGuard } from './guard/meta.auth.guard';
 
-export class Token {
-  @IsString()
-  refresh_token: string;
-}
 @ApiTags('auth')
 @Controller('auth')
 export class AuthenticationController {
@@ -66,7 +62,7 @@ export class AuthenticationController {
     if (!access_token) {
       throw new NotFoundException('Invalid code');
     }
-    const decoded = this.jwtService.decode(access_token) as JwtPayload;
+    const decoded = this.jwtService.decode(access_token) as IJwtPayload;
     const session = await this.authenticationService.findSessionByUserId(
       decoded.sub.id,
     );
@@ -205,7 +201,7 @@ export class AuthenticationController {
     statusCode: HttpStatus.OK,
     type: UserOutputDto,
   })
-  async refresh(@Body() input: Token) {
+  async refresh(@Body() input: TokenReqDto) {
     return await this.authenticationService.refreshToken(input.refresh_token);
   }
 

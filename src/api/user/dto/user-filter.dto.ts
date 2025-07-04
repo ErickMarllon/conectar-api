@@ -47,4 +47,19 @@ export class UserFilterDto {
   @IsDate()
   @ApiProperty({ example: new Date(), description: 'End data' })
   endDate?: Date;
+
+  @Expose()
+  @IsString()
+  @IsOptional()
+  phone?: string;
+
+  @Expose()
+  @IsString()
+  @IsOptional()
+  whatsapp?: string;
+
+  @Expose()
+  @IsString()
+  @IsOptional()
+  cpf?: string;
 }

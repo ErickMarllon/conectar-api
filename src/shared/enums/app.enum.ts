@@ -32,6 +32,7 @@ export enum AuthProvider {
   JWT = 'jwt',
   JWT_REFRESH = 'jwt-refresh',
 }
+
 export enum AccessTypes {
   ACCESS = 'access',
   REFRESH = 'refresh',

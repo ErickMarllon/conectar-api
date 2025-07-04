@@ -3,8 +3,6 @@ import { userSearchFields } from '@/shared/constants/user.search.fields';
 import { OffsetPaginationDto } from '@/shared/dtos/offset-pagination/offset-pagination.dto';
 import { OffsetPaginatedDto } from '@/shared/dtos/offset-pagination/paginated.dto';
 import { QueryDto } from '@/shared/dtos/query.dto';
-import { UserWithoutPasswordDto } from '@/shared/dtos/user-without-password-dto';
-import { UserDto } from '@/shared/dtos/user.dto ';
 import { AuthProvider, SortBy } from '@/shared/enums/app.enum';
 import { getChangedFields } from '@/shared/utils/getChangedFields';
 import { hashPassword, verifyPassword } from '@/shared/utils/password.util';
@@ -15,12 +13,15 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { plainToInstance } from 'class-transformer';
-import { Repository } from 'typeorm';
+import { FindOptionsWhere, Repository } from 'typeorm';
+import { LoginReqDto } from '../authentication/dto/login.req.dto';
+import { RegisterReqDto } from '../authentication/dto/register.req.dto';
 import { QueryUserDto } from './dto/query-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdateUserDto, UpdateUserOauthDto } from './dto/update-user.dto';
 import { UserFilterDto } from './dto/user-filter.dto';
 import { UserOutputDto } from './dto/user-output.dto';
-import { findOrCreateInputDTO, UserSignInDTO } from './user.dto';
+import { UserWithoutPasswordDto } from './dto/user-without-password-dto';
+import { UserDto } from './dto/user.dto ';
 import { applyAdvancedFilter } from './utils/apply-advanced-filter';
 import { applySearch } from './utils/apply-search.util';
 
@@ -30,20 +31,28 @@ export class UsersService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
   ) {}
-
   async findOrCreate(
-    input: findOrCreateInputDTO,
+    input: UpdateUserOauthDto,
   ): Promise<UserWithoutPasswordDto> {
-    const existingUser = await this.findByEmail(input.email);
+    const existingUser = await this.findOneBy({ email: input.email });
 
     if (existingUser) {
-      return existingUser;
+      return plainToInstance(UserWithoutPasswordDto, existingUser, {
+        excludeExtraneousValues: true,
+      });
     }
 
-    return await this.create(input);
+    const user = this.userRepository.create(input);
+    const savedUser = await this.userRepository.save(user);
+
+    return plainToInstance(UserWithoutPasswordDto, savedUser, {
+      excludeExtraneousValues: true,
+    });
   }
 
-  async findAll(query: QueryUserDto): Promise<OffsetPaginatedDto<User>> {
+  async findAll(
+    query: QueryUserDto,
+  ): Promise<OffsetPaginatedDto<UserWithoutPasswordDto>> {
     const {
       sortBy = SortBy.CREATED_AT,
       searchTerm,
@@ -76,11 +85,18 @@ export class UsersService {
       offset,
     });
 
-    return new OffsetPaginatedDto<User>(items, paginationMeta);
+    return new OffsetPaginatedDto<UserWithoutPasswordDto>(
+      plainToInstance(UserWithoutPasswordDto, items, {
+        excludeExtraneousValues: true,
+      }),
+      paginationMeta,
+    );
   }
 
-  async validateCredentials(input: UserSignInDTO): Promise<User> {
-    const user = await this.findByEmail(input.email, ['session']);
+  async validateCredentials(
+    input: LoginReqDto,
+  ): Promise<UserWithoutPasswordDto> {
+    const user = await this.findOneBy({ email: input.email }, ['session']);
 
     if (!user) {
       throw new UnauthorizedException('Invalid email or password');
@@ -90,31 +106,43 @@ export class UsersService {
       await this.userRepository.update(user.id, {
         password: await hashPassword(input.password),
       });
-      return user;
+      return plainToInstance(UserWithoutPasswordDto, user, {
+        excludeExtraneousValues: true,
+      });
     }
 
     if (!(await verifyPassword(input.password, user.password))) {
       throw new UnauthorizedException('Invalid email or password');
     }
 
-    return user;
+    return plainToInstance(UserWithoutPasswordDto, user, {
+      excludeExtraneousValues: true,
+    });
   }
 
   async getMe(id: string): Promise<UserOutputDto> {
-    const user = await this.findByID(id, ['session']);
+    const user = await this.findOneBy({ id }, ['session']);
 
     if (!user) {
       throw new NotFoundException(`User with ID "${id}" not found`);
     }
-
-    return {
-      ...user,
-      access_token: user.session?.access_token,
-      refresh_token: user.session?.refresh_token,
-    };
+    return plainToInstance(
+      UserOutputDto,
+      {
+        ...user,
+        access_token: user.session?.access_token,
+        refresh_token: user.session?.refresh_token,
+        token_expires: user.session?.expires,
+      },
+      {
+        excludeExtraneousValues: true,
+      },
+    );
   }
 
-  async findInactive(query: QueryDto): Promise<OffsetPaginatedDto<User>> {
+  async findInactive(
+    query: QueryDto,
+  ): Promise<OffsetPaginatedDto<UserWithoutPasswordDto>> {
     const { limit, offset, page, order, searchTerm } = query;
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
@@ -141,14 +169,19 @@ export class UsersService {
       offset,
     });
 
-    return new OffsetPaginatedDto<User>(items, paginationMeta);
+    return new OffsetPaginatedDto<UserWithoutPasswordDto>(
+      plainToInstance(UserWithoutPasswordDto, items, {
+        excludeExtraneousValues: true,
+      }),
+      paginationMeta,
+    );
   }
 
   async updateUser(
     id: string,
     input: UpdateUserDto,
   ): Promise<UserWithoutPasswordDto> {
-    const user = await this.findByID(id);
+    const user = await this.findOneBy({ id });
     if (!user) {
       throw new NotFoundException(`User with ID "${id}" not found`);
     }
@@ -162,7 +195,7 @@ export class UsersService {
       password,
     });
 
-    const updatedUser = await this.findByID(id);
+    const updatedUser = await this.findOneBy({ id });
 
     return plainToInstance(UserWithoutPasswordDto, updatedUser, {
       excludeExtraneousValues: true,
@@ -177,23 +210,14 @@ export class UsersService {
     await this.userRepository.update(id, { last_login_at: new Date() });
   }
 
-  async findByID(id: string, relations: string[] = []) {
+  async findOneBy(where: FindOptionsWhere<UserDto>, relations: string[] = []) {
     return await this.userRepository.findOne({
-      where: { id },
+      where,
       relations,
     });
   }
 
-  async findByEmail(email: string, relations: string[] = []) {
-    return await this.userRepository.findOne({
-      where: { email },
-      relations,
-    });
-  }
-
-  async create(
-    createUserDto: findOrCreateInputDTO,
-  ): Promise<UserWithoutPasswordDto> {
+  async create(createUserDto: RegisterReqDto): Promise<UserWithoutPasswordDto> {
     const user = this.userRepository.create(createUserDto);
     return await this.userRepository.save(user);
   }

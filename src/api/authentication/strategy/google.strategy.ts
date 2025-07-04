@@ -1,4 +1,3 @@
-import { OAuthUserDTO } from '@/api/user/user.dto';
 import { googleScope } from '@/shared/constants/app.constant';
 import { AuthProvider } from '@/shared/enums/app.enum';
 import { Injectable } from '@nestjs/common';
@@ -7,7 +6,8 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Profile, Strategy } from 'passport-google-oauth20';
 import { GoogleConfig } from 'src/infrastructure/config/types/google-config.type';
 import { AuthenticationService } from '../authentication.service';
-import { OAuthDTO } from '../dto/auth.dto';
+import { OAuthUserDTO } from '../dto/oauth-user.dto';
+import { OAuthDTO } from '../dto/oauth.dto';
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(
@@ -50,7 +50,7 @@ export class GoogleStrategy extends PassportStrategy(
     const userDto = new OAuthUserDTO();
     userDto.email = email || '';
     userDto.first_name = first_name || '';
-    userDto.last_name = last_name;
+    userDto.last_name = last_name || '';
     userDto.picture = this.getHighResGooglePhoto(picture);
 
     return await this.authenticationService.validateOAuthUser(authDto, userDto);

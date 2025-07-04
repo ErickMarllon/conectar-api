@@ -1,5 +1,4 @@
 // src/modules/auth/strategies/meta.strategy.ts
-import { OAuthUserDTO } from '@/api/user/user.dto';
 import { MetaConfig } from '@/infrastructure/config/types/meta-config.type';
 import { metaScope, profileFieldsMeta } from '@/shared/constants/app.constant';
 import { AuthProvider } from '@/shared/enums/app.enum';
@@ -9,7 +8,8 @@ import { PassportStrategy } from '@nestjs/passport';
 import axios from 'axios';
 import { Profile, Strategy } from 'passport-facebook';
 import { AuthenticationService } from '../authentication.service';
-import { OAuthDTO } from '../dto/auth.dto';
+import { OAuthUserDTO } from '../dto/oauth-user.dto';
+import { OAuthDTO } from '../dto/oauth.dto';
 
 @Injectable()
 export class MetaStrategy extends PassportStrategy(

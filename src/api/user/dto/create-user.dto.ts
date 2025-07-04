@@ -1,38 +1,10 @@
-import { UserRole } from '@/shared/enums/app.enum';
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import {
-  IsEmail,
-  IsEnum,
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-  MinLength,
-} from 'class-validator';
+import { PickType } from '@nestjs/swagger';
+import { UserDto } from './user.dto ';
 
-export class CreateUserDto {
-  @ApiProperty({ example: 'John Doe' })
-  @IsNotEmpty()
-  @IsString()
-  first_name: string;
-
-  @ApiProperty({ example: 'John Doe' })
-  @IsNotEmpty()
-  @IsString()
-  last_name: string;
-
-  @ApiProperty({ example: 'john@example.com' })
-  @IsNotEmpty()
-  @IsEmail()
-  email: string;
-
-  @ApiProperty({ example: 'password123' })
-  @IsNotEmpty()
-  @IsString()
-  @MinLength(8)
-  password: string;
-
-  @ApiPropertyOptional({ enum: UserRole, default: UserRole.USER })
-  @IsOptional()
-  @IsEnum(UserRole)
-  role?: UserRole;
-}
+export class CreateUserDto extends PickType(UserDto, [
+  'email',
+  'password',
+  'first_name',
+  'last_name',
+  'role',
+]) {}

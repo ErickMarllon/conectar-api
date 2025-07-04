@@ -1,9 +1,9 @@
-import { User } from '@/infrastructure/database/entities/user-typeorm.entity';
 import { SelectQueryBuilder } from 'typeorm';
 import { UserFilterDto } from '../dto/user-filter.dto';
+import { UserDto } from '../dto/user.dto ';
 
 interface AdvancedUserFilter {
-  queryBuilder: SelectQueryBuilder<User>;
+  queryBuilder: SelectQueryBuilder<UserDto>;
   alias: string;
   filters?: Partial<UserFilterDto>;
 }
@@ -46,6 +46,22 @@ export function applyAdvancedFilter({
       endDate: filters.endDate,
     });
   }
+  if (filters?.phone) {
+    queryBuilder.andWhere(`${alias}.phone ILIKE :phone`, {
+      phone: `%${filters.phone}%`,
+    });
+  }
 
+  if (filters?.whatsapp) {
+    queryBuilder.andWhere(`${alias}.whatsapp ILIKE :whatsapp`, {
+      whatsapp: `%${filters.whatsapp}%`,
+    });
+  }
+
+  if (filters?.cpf) {
+    queryBuilder.andWhere(`${alias}.cpf ILIKE :cpf`, {
+      cpf: `%${filters.cpf}%`,
+    });
+  }
   return queryBuilder;
 }

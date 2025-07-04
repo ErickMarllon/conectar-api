@@ -1,4 +1,4 @@
-import { UserDto } from '@/shared/dtos/user.dto ';
+import { UserDto } from '@/api/user/dto/user.dto ';
 import { AuthProvider } from '@/shared/enums/app.enum';
 import { ExecutionContext, Injectable } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';

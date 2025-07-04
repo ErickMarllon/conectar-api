@@ -1,4 +1,3 @@
-import { JwtPayload } from '@/api/user/user.dto';
 import { JwtConfig } from '@/infrastructure/config/types/jwt-config.type';
 import { AuthProvider } from '@/shared/enums/app.enum';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
@@ -6,6 +5,7 @@ import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { AuthenticationService } from '../authentication.service';
+import { IJwtPayload } from '../dto/Ijwt-payload.dto';
 
 @Injectable()
 export class JwtRefreshStrategy extends PassportStrategy(
@@ -27,7 +27,7 @@ export class JwtRefreshStrategy extends PassportStrategy(
     });
   }
 
-  async validate(payload: JwtPayload) {
+  async validate(payload: IJwtPayload) {
     const user = await this.authService.validateAccessToken(payload);
     if (!user) {
       throw new UnauthorizedException();

@@ -33,6 +33,21 @@ export class User extends AbstractEntity {
   @Exclude()
   password: string;
 
+  @Column({ nullable: true })
+  country_code: string;
+
+  @Column({ nullable: true })
+  area_code: string;
+
+  @Column({ nullable: true })
+  phone: string;
+
+  @Column({ nullable: true })
+  whatsapp: string;
+
+  @Column({ nullable: true })
+  cpf: string;
+
   @Column({
     type: 'enum',
     enum: UserRole,
