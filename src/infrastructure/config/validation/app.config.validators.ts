@@ -2,7 +2,6 @@ import { Transform } from 'class-transformer';
 import {
   IsArray,
   IsBoolean,
-  IsEnum,
   IsInt,
   IsOptional,
   IsString,
@@ -10,12 +9,11 @@ import {
   Max,
   Min,
 } from 'class-validator';
-import { Environment } from '../types/environments.enum';
 
 export class AppEnvConfigValidator {
-  @IsEnum(Environment)
   @IsString()
-  NODE_ENV: Environment;
+  @IsOptional()
+  NODE_ENV: string;
 
   @IsString()
   @IsOptional()
