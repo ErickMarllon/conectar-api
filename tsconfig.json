@@ -17,11 +17,11 @@
     "rootDirs": ["src"],
     "incremental": true,
     "skipLibCheck": true,
-    "strictNullChecks": true, //false
+    "strictNullChecks": true,
     "noImplicitAny": false,
     "resolveJsonModule": true,
-    "strictBindCallApply": false, //false
-    "forceConsistentCasingInFileNames": true, //false
+    "strictBindCallApply": false,
+    "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": false,
     "esModuleInterop": true,
     "importHelpers": true,
