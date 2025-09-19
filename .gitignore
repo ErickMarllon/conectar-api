@@ -2,6 +2,9 @@
 /dist
 /node_modules
 /build
+/docs/clean-architecture-copy-2.mermaid
+/docs/clean-architecture-copy.mermaid
+/docs/clean-architecture.mermaid
 
 # Logs
 logs
