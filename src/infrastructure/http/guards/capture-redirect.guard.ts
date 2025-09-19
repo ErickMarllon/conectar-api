@@ -7,6 +7,7 @@ export class CaptureRedirectGuard implements CanActivate {
     const request = context.switchToHttp().getRequest<Request>();
 
     let redirectUrl = <string>request.query.redirect;
+
     const tenant = <string>request.query.tenant;
 
     if (!redirectUrl) redirectUrl = '/';

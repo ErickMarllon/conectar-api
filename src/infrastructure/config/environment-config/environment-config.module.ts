@@ -8,7 +8,6 @@ import databaseConfig from './database.config';
 import googleConfig from './google.config';
 import jwtConfig from './jwt.config';
 import metaConfig from './meta.config';
-import webConfig from './web.config';
 
 let envFile = '';
 
@@ -41,7 +40,6 @@ if (envFile) {
         googleConfig,
         jwtConfig,
         metaConfig,
-        webConfig,
         awsConfig,
       ],
     }),

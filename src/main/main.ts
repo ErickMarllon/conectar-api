@@ -19,7 +19,14 @@ import {
 import { AppModule } from './app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, { cors: true });
+  const app = await NestFactory.create(AppModule);
+  app.enableCors({
+    origin: (origin, callback) => callback(null, true),
+    methods: 'GET,POST,PUT,PATH,DELETE',
+    allowedHeaders: 'Content-Type, Authorization',
+    credentials: true,
+  });
+
   const configService = app.get(ConfigService);
   const appConfig = configService.getOrThrow<AppConfig>('app');
   const logger = new LoggerService();
@@ -57,7 +64,7 @@ async function bootstrap() {
         maxAge: 24 * 60 * 60 * 1000,
         secure: appConfig.nodeEnv === 'production',
         httpOnly: true,
-        sameSite: appConfig.nodeEnv === 'production' ? 'none' : 'lax',
+        sameSite: 'lax',
       },
     }),
   );
