@@ -16,6 +16,8 @@ if (process.env.NODE_ENV && fs.existsSync(`env/.env.${process.env.NODE_ENV}`)) {
   envFile = `env/.env.${process.env.NODE_ENV}`;
 } else if (fs.existsSync('/etc/secrets/.env')) {
   envFile = '/etc/secrets/.env';
+} else if (fs.existsSync('env/.env')) {
+  envFile = 'env/.env';
 } else if (fs.existsSync('.env')) {
   envFile = '.env';
 }
