@@ -149,7 +149,7 @@ DATABASE_URL=postgres://postgres:postgres@localhost:5433/conectar-company
 
 # JWT
 JWT_SECRET=secret-key
-JWT_TOKEN_EXPIRES_IN=1D
+JWT_TOKEN_EXPIRES_IN=1M
 JWT_REFRESH_SECRET=secret_for_refresh
 JWT_REFRESH_TOKEN_EXPIRES_IN=7D
 

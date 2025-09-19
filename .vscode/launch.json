@@ -5,7 +5,13 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "command": "npm start",
+      "command": "yarn start:dev",
+      "name": "Run yarn start:dev",
+      "request": "launch",
+      "type": "node-terminal"
+    },
+    {
+      "command": "yarn start:dev",
       "name": "docker compose up",
       "request": "launch",
       "type": "node-terminal"

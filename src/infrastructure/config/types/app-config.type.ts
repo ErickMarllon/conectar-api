@@ -5,5 +5,5 @@ export type AppConfig = {
   port: number;
   apiPrefix: string;
   fallbackLanguage: string;
-  corsOrigin: boolean | string | RegExp | (string | RegExp)[];
+  corsOrigin: boolean | string | string[];
 };

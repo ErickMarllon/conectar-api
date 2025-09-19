@@ -1,0 +1,7 @@
+export enum TenantStatus {
+  ACTIVE = 'ACTIVE',
+  INACTIVE = 'INACTIVE',
+  SUSPENDED = 'SUSPENDED',
+  CANCELLED = 'CANCELLED',
+  EXPIRED = 'EXPIRED',
+}

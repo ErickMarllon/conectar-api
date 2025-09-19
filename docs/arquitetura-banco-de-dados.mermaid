@@ -1,0 +1,494 @@
+erDiagram
+    %% Definindo as entidades e seus atributos
+    TENANT {
+        uuid id
+        string name
+        string whatsapp
+        string phone_number
+        uuid plan_id
+        string status
+        string referral_api_key
+        bool enable_service_schedule
+        bool enable_google_calendar
+        timestamp created_at
+        timestamp updated_at
+    }
+    
+    TENANT_NOTIFICATION_SETTING {
+        uuid id
+        uuid tenant_id
+        bool is_active
+        bool is_email
+        bool is_sms
+        bool is_push
+        bool is_whatsapp
+        bool notify_new_user
+        bool notify_new_order
+        bool notify_order_status
+        bool notify_payment_received
+        bool notify_invoice_created
+        bool notify_service_schedule_status
+        bool notify_service_schedule_reminder
+        bool notify_low_stock
+        bool notify_referral_reward
+        bool notify_marketing_event
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    TENANT_SOCIAL {
+        uuid id
+        uuid tenant_id
+        string provider_facebook
+        string provider_instagram
+        string provider_linkedin
+        string provider_twitter
+        timestamp created_at
+        timestamp updated_at
+    }
+    
+    TENANT_SUBSCRIPTION {
+        uuid id
+        uuid tenant_id
+        uuid plan_id
+        decimal amount_paid
+        timestamp start_date
+        timestamp end_date
+        timestamp paid_at
+        enum status
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    EVENT_TYPE {
+        uuid id
+        string code
+        string name
+        string description
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    NOTIFICATION_EVENT {
+        uuid id
+        uuid tenant_id
+        uuid user_id
+        uuid service_schedule_id
+        uuid order_id
+        uuid event_type_id
+        string status
+        timestamp scheduled_at
+        timestamp sent_at
+        string message
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    GATEWAY_SETTING {
+        uuid id
+        uuid tenant_id
+        enum provider
+        string api_key
+        enum status
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    TENANT_ADDRESS {
+        uuid id
+        uuid tenant_id
+        string zip_code
+        string street
+        string number
+        string complement
+        string neighborhood
+        string city
+        string state
+        string country
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    PLAN {
+        uuid id
+        string name
+        enum interval
+        int max_users
+        int max_products
+        int max_services
+        string description
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    ROLE {
+        uuid id
+        string name
+        string description
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    PERMISSION {
+        uuid id
+        string code
+        string description
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    ROLE_PERMISSION {
+        uuid role_id
+        uuid permission_id
+    }
+
+    USER_PERMISSION {
+        uuid id
+        uuid user_id
+        uuid permission_id
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    USER {
+        uuid id
+        string first_name
+        string last_name
+        string email
+        string phone_number
+        string cpf_cnpj
+        string avatar_url
+        string password
+        uuid role_id
+        uuid tenant_id
+        string status
+        bool is_verified
+        timestamp last_login_at
+        timestamp created_at
+        timestamp updated_at
+    } 
+
+    USER_SOCIAL {
+        uuid id
+        uuid user_id
+        string provider_facebook
+        string provider_instagram
+        string provider_linkedin
+        string provider_twitter
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    SESSION {
+        uuid id
+        uuid user_id
+        uuid tenant_id
+        string source
+        string source_id
+        string access_token
+        string refresh_token
+        bigint access_token_expires
+        bigint refresh_token_expires
+        string ip_address
+        string user_agent
+        string status
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    ADDRESS {
+        uuid id
+        uuid user_id
+        string zip_code
+        string street
+        string street_number
+        string complement
+        string neighborhood
+        string city
+        string state
+        string country
+        bool is_default
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    CATEGORY {
+        uuid id
+        string name
+        string type
+        uuid tenant_id
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    PRODUCT {
+        uuid id
+        string name
+        string sku
+        string gender
+        string description
+        decimal price
+        int sold_quantity
+        enum discount_type
+        decimal discount_value
+        decimal final_price
+        decimal total_rating
+        decimal total_review
+        int reserved_quantity
+        int available
+        uuid category_id
+        uuid tenant_id
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    PRODUCT_PRICE_HISTORY {
+        uuid id
+        uuid product_id
+        decimal price
+        enum discount_type
+        decimal discount_value
+        timestamp start_date
+        timestamp end_date
+    }
+
+    PRODUCT_REVIEW {
+        uuid id
+        uuid product_id
+        uuid user_id
+        int rating
+        string comment
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    SERVICE {
+        uuid id
+        string name
+        string description
+        decimal price
+        uuid category_id
+        enum discount_type
+        decimal discount_value
+        string DeliveryMethod
+        uuid tenant_id
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    SERVICE_SCHEDULE {
+        uuid id
+        uuid service_id
+        uuid user_id
+        uuid tenant_id
+        enum status
+        decimal deposit_amount
+        decimal total_amount
+        enum deposit_type
+        enum deposit_status
+        string notes
+        timestamp deposit_paid_at
+        timestamp scheduled_at
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    GOOGLE_CALENDAR_SYNC {
+        uuid id
+        uuid service_schedule_id
+        string google_event_id
+        timestamp synced_at
+        string status
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    SERVICE_PRODUCT {
+        uuid id
+        uuid service_id
+        uuid product_id
+        int quantity
+    }
+
+    SERVICE_PRICE_HISTORY {
+        uuid id
+        uuid service_id
+        decimal price
+        enum discount_type
+        decimal discount_value
+        timestamp start_date
+        timestamp end_date
+    }
+
+    ORDER {
+        uuid id
+        uuid tenant_id
+        uuid user_id
+        string type
+        decimal total_price
+        enum discount_type
+        decimal discount_value
+        enum PaymentMethod
+        enum DeliveryMethod
+        enum status
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    ORDER_ITEM {
+        uuid id
+        uuid order_id
+        uuid product_id
+        uuid service_id
+        int quantity
+        decimal price
+    }
+
+    STOCK_MOVEMENT {
+        uuid id
+        uuid product_id
+        int quantity
+        string type
+        timestamp created_at
+        string reason
+    }
+
+    INVOICE {
+        uuid id
+        uuid tenant_id
+        uuid order_id
+        string type
+        decimal total
+        decimal total_discount
+        string details
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    PAYMENT {
+        uuid id
+        uuid tenant_id
+        uuid invoice_id
+        uuid service_schedule_id
+        enum gateway
+        enum status
+        decimal amount
+        timestamp paid_at
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    MARKETING_PIXEL {
+        uuid id
+        uuid tenant_id
+        string provider
+        string pixel_id
+        string pixel_secret
+        jsonb config
+        string description
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    PIXEL_EVENT {
+        uuid id
+        uuid marketing_pixel_id
+        uuid user_id
+        string event_type
+        string details
+        timestamp occurred_at
+    }
+
+    TRACKING_EVENT {
+        uuid id
+        uuid tenant_id
+        uuid user_id
+        string event_type
+        string details
+        timestamp occurred_at
+    }
+
+    REFERRAL_CODE {
+        uuid id
+        uuid tenant_id
+        string code
+        decimal reward_value
+        decimal reward_percentage
+        string description
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    REFERRAL {
+        uuid id
+        uuid referral_code_id
+        uuid referred_tenant_id
+        uuid referred_user_id
+        decimal reward_amount
+        string status
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    REFERRAL_PAYMENT {
+        uuid id
+        uuid referral_id
+        decimal amount
+        enum status
+        timestamp scheduled_at
+        timestamp paid_at
+        string payment_gateway
+        string transaction_id
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    %% RELACIONAMENTOS
+    TENANT }o--o| PLAN : "has"
+    TENANT ||--o{ TENANT_ADDRESS : "has"
+    TENANT ||--o{ USER : "owns"
+    TENANT ||--o{ GATEWAY_SETTING : "configures"
+    TENANT ||--o{ TENANT_NOTIFICATION_SETTING : "configures"
+    EVENT_TYPE ||--o{ NOTIFICATION_EVENT : "defines"
+    TENANT ||--o{ NOTIFICATION_EVENT : "owns"
+    USER ||--o{ NOTIFICATION_EVENT : "related_to"
+    SERVICE_SCHEDULE ||--o{ NOTIFICATION_EVENT : "linked_to"
+    ORDER ||--o{ NOTIFICATION_EVENT : "linked_to"
+    USER ||--o{ ADDRESS : "has"
+    TENANT ||--o{ CATEGORY : "defines"
+    CATEGORY ||--o{ PRODUCT : "contains"
+    CATEGORY ||--o{ SERVICE : "contains"
+    PRODUCT ||--o{ PRODUCT_REVIEW : "has"
+    USER ||--o{ PRODUCT_REVIEW : "writes"
+    SERVICE ||--o{ SERVICE_PRODUCT : "includes"
+    SERVICE ||--o{ SERVICE_PRICE_HISTORY : "has"
+    USER ||--o{ SERVICE_SCHEDULE : "books"
+    ROLE ||--o{ USER : "has"
+    SERVICE ||--o{ SERVICE_SCHEDULE : "scheduled"
+    TENANT ||--o{ SERVICE_SCHEDULE : "provides"
+    PAYMENT ||--o{ SERVICE_SCHEDULE : "covers"
+    PRODUCT ||--o{ SERVICE_PRODUCT : "used_in"
+    PRODUCT ||--o{ PRODUCT_PRICE_HISTORY : "has"
+    TENANT ||--o{ ORDER : "receives"
+    USER ||--o{ ORDER : "places"
+    ORDER ||--o{ ORDER_ITEM : "contains"
+    PRODUCT ||--o{ ORDER_ITEM : "sold_in"
+    SERVICE ||--o{ ORDER_ITEM : "sold_in"
+    PRODUCT ||--o{ STOCK_MOVEMENT : "tracks"
+    TENANT ||--o{ INVOICE : "issues"
+    ORDER ||--o{ INVOICE : "generates"
+    INVOICE ||--o{ PAYMENT : "receives"
+    TENANT ||--o{ MARKETING_PIXEL : "owns"
+    MARKETING_PIXEL ||--o{ PIXEL_EVENT : "collects"
+    TENANT ||--o{ TRACKING_EVENT : "collects"
+    USER ||--o{ TRACKING_EVENT : "triggers"
+    USER ||--o{ PIXEL_EVENT : "triggers"
+    TENANT ||--o{ REFERRAL_CODE : "generates"
+    REFERRAL_CODE ||--o{ REFERRAL : "tracks"
+    REFERRAL ||--o{ REFERRAL_PAYMENT : "generates"
+    TENANT ||--o{ REFERRAL : "receives"
+    USER ||--o{ REFERRAL : "refers"
+    TENANT ||--o{ SESSION : "owns"
+    USER ||--o{ SESSION : "owns"
+    TENANT ||--o{ TENANT_SOCIAL : "has"
+    USER ||--o{ USER_SOCIAL : "has"
