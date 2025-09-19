@@ -32,6 +32,7 @@ import { GenericEntityFactoryModule } from '../factories/usecases/generic-model.
 import { OAuthModule } from '../factories/usecases/oauth/oauth.module';
 import { TenantUseCasesModule } from '../factories/usecases/tenant/tenant.factory.module';
 import { UserUseCasesModule } from '../factories/usecases/user/user.factory.module';
+import { AppController } from './app.controller';
 import { AuthController } from './auth/auth.controller';
 import { OAuthController } from './auth/oauth.controller';
 import { TenantController } from './tenant/tenant.controller';
@@ -59,6 +60,7 @@ import { TenantController } from './tenant/tenant.controller';
     UserController,
     TenantController,
     GenericEntityController,
+    AppController,
   ],
   providers: [
     { provide: APP_GUARD, useClass: JwtAuthGuard },

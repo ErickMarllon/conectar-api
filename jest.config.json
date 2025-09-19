@@ -1,31 +1,21 @@
 {
   "moduleFileExtensions": ["js", "json", "ts"],
   "rootDir": ".",
-  "testRegex": ".*\\.spec\\.ts$",
+  "testRegex": ".*\\.e2e\\.spec\\.ts$",
   "transform": {
     "^.+\\.(t|j)s$": "ts-jest"
   },
   "collectCoverageFrom": ["**/*.(t|j)s", "!**/*.spec.(t|j)s"],
   "coveragePathIgnorePatterns": [
     "/node_modules/",
-    "<rootDir>/database/(factories|migrations|seeds)/",
+    "<rootDir>src/infrastructure/database/(factories|migrations|seeds)/",
     "<rootDir>/main.ts",
     "(.+).module.ts"
   ],
   "coverageDirectory": "../coverage",
   "testEnvironment": "node",
   "moduleNameMapper": {
-    "^@/api/(.*)$": "<rootDir>/src/api/$1",
-    "^@/infrastructure/(.*)$": "<rootDir>/src/infrastructure/$1",
-    "^@/common/(.*)$": "<rootDir>/src/common/$1",
-    "^@/config/(.*)$": "<rootDir>/src/config/$1",
-    "^@/database/(.*)$": "<rootDir>/src/infrastructure/database/$1",
-    "^@/decorators/(.*)$": "<rootDir>/src/decorators/$1",
-    "^@/exceptions/(.*)$": "<rootDir>/src/exceptions/$1",
-    "^@/guards/(.*)$": "<rootDir>/src/guards/$1",
-    "^@/libs/(.*)$": "<rootDir>/src/libs/$1",
-    "^@/shared/(.*)$": "<rootDir>/src/shared/$1",
-    "^@/utils/(.*)$": "<rootDir>/src/utils/$1"
+    "^@/(.*)$": "<rootDir>/src/$1"
   },
   "setupFiles": ["<rootDir>/setup-jest.mjs"],
   "cacheDirectory": "../.jest-cache",
