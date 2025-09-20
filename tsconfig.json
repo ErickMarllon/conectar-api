@@ -14,7 +14,6 @@
     "sourceMap": true,
     "baseUrl": "./src",
     "outDir": "./dist",
-    "rootDirs": ["."],
     "incremental": true,
     "skipLibCheck": true,
     "strictNullChecks": true,
