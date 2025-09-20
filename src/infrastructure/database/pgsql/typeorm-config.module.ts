@@ -19,7 +19,7 @@ export const getTypeOrmModuleOptions = (configService: ConfigService): any => {
     synchronize: false,
     logging: false,
     ssl: {
-      rejectUnauthorized: false,
+      rejectUnauthorized: true,
     },
     schema: 'public',
     migrationsTableName: 'migrations',

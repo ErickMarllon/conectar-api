@@ -26,7 +26,7 @@ const options: DataSourceOptions & SeederOptions = {
   entities,
   migrations,
   ssl: {
-    rejectUnauthorized: false,
+    rejectUnauthorized: true,
   },
   factories,
   seeds,
