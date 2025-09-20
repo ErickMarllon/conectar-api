@@ -7,4 +7,4 @@ RUN yarn install
 
 COPY . .
 
-CMD ["node", "dist/main/main.js"]
+CMD ["yarn", "start"]
