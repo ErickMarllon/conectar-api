@@ -14,6 +14,7 @@ export class PgsqlTenant {
   id: string;
   name: string;
   whatsapp: string;
+  email?: string;
   logo_url?: string;
   cover_url?: string;
   phone_number: string;
@@ -23,6 +24,7 @@ export class PgsqlTenant {
   about?: string;
   enable_service_schedule: boolean;
   enable_google_calendar: boolean;
+  is_public: boolean;
   created_at: Date;
   updated_at: Date;
   subscriptions: PgsqlTenantSubscription[];

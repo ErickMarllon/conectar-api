@@ -8,6 +8,7 @@ import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory, Reflector } from '@nestjs/core';
 import session from 'express-session';
+
 import helmet from 'helmet';
 import 'multer';
 import passport from 'passport';
@@ -20,16 +21,16 @@ import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.enableCors({
-    origin: (origin, callback) => callback(null, true),
-    methods: 'GET,POST,PUT,PATH,DELETE',
-    allowedHeaders: 'Content-Type, Authorization',
-    credentials: true,
-  });
 
   const configService = app.get(ConfigService);
   const appConfig = configService.getOrThrow<AppConfig>('app');
   const logger = new LoggerService();
+
+  app.enableCors({
+    origin: appConfig.corsOrigin,
+    methods: 'GET,HEAD,POST,PUT,PATCH,DELETE',
+    credentials: true,
+  });
 
   app.setGlobalPrefix(appConfig.apiPrefix);
 

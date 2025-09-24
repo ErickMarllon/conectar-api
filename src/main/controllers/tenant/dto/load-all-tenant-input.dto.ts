@@ -41,6 +41,12 @@ export class LoadAllTenantInputDto {
   phone_number?: string;
 
   @Expose()
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  email?: string;
+
+  @Expose()
   @ApiPropertyOptional({ enum: TenantStatus })
   @IsOptional()
   @IsEnum(TenantStatus)

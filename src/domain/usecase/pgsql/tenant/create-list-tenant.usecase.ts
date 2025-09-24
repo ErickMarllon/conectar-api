@@ -1,17 +1,16 @@
 import { IAwsService } from '@/domain/contracts/gateways/awss3';
-import { PgsqlTenant } from '@/domain/contracts/pgsql/entities';
 import {
   FindAllTenantsParams,
   ITenantRepository,
 } from '@/domain/contracts/pgsql/repositories/tenant.repository.interface';
-import { LoadAllTenantOutputDto } from '@/main/controllers/tenant/dto/load-all-tenant-output.dto';
+import { LoadTenantOutputDto } from '@/main/controllers/tenant/dto';
 import { PaginateResponse } from '@/shared/paginate/types';
 import { BadRequestException } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
 
 export type CreateListTenantUseCase = (
   input: FindAllTenantsParams,
-) => Promise<PaginateResponse<LoadAllTenantOutputDto>>;
+) => Promise<PaginateResponse<LoadTenantOutputDto>>;
 
 export type CreateListTenantUseCaseFactory = (
   tenantRepo: ITenantRepository,
@@ -25,7 +24,7 @@ export const createListTenantUseCase: CreateListTenantUseCaseFactory =
     if (!paginated) {
       throw new BadRequestException(`Tenant not found`);
     }
-    const transformed: PgsqlTenant[] = [];
+    const transformed: any[] = [];
 
     for (const tenant of paginated?.items ?? []) {
       tenant.cover_url = tenant.cover_url?.startsWith('https://')
@@ -36,10 +35,10 @@ export const createListTenantUseCase: CreateListTenantUseCaseFactory =
         ? tenant.logo_url
         : await awsS3.getImage(tenant.logo_url);
 
-      transformed.push(tenant);
+      transformed.push({ ...tenant, social_links: tenant.social });
     }
 
-    const items = plainToInstance(LoadAllTenantOutputDto, transformed ?? [], {
+    const items = plainToInstance(LoadTenantOutputDto, transformed ?? [], {
       excludeExtraneousValues: true,
     });
 

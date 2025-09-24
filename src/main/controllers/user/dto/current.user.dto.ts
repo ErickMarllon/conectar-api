@@ -1,4 +1,4 @@
-import { UserStatus } from '@/shared/enums';
+import { TenantStatus } from '@/shared/enums';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Expose, Transform, Type } from 'class-transformer';
 import {
@@ -53,8 +53,8 @@ export class CurrentUserDto {
   @Expose()
   @ApiPropertyOptional()
   @IsOptional()
-  @IsEnum(UserStatus)
-  status?: UserStatus;
+  @IsEnum(TenantStatus)
+  status?: TenantStatus;
 
   @Expose()
   @ApiProperty()

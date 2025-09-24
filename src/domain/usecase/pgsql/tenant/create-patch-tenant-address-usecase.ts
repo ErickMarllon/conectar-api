@@ -1,44 +1,46 @@
 import { Payload } from '@/domain/contracts/auth/jwt';
 import {
-  IAddressRepository,
-  IUserRepository,
+  ITenantAddressRepository,
+  ITenantRepository,
 } from '@/domain/contracts/pgsql/repositories';
 import { UpdateAddressDto } from '@/infrastructure/http/dtos/address/update-address-data.dto';
 
 import { plainToInstance } from 'class-transformer';
 
-export type UpdateUserAddressUseCase = (input: {
-  user_id: string;
+export type PathTenantAddressUseCase = (input: {
+  tenant_id: string;
   address: UpdateAddressDto;
   currentUser: Payload['sub'];
 }) => Promise<UpdateAddressDto | undefined>;
 
 export type UpdateUserAddressUseCaseFactory = (
-  addressRepo: IAddressRepository,
-  usersRepo: IUserRepository,
-) => UpdateUserAddressUseCase;
+  addressRepo: ITenantAddressRepository,
+  tenantRepo: ITenantRepository,
+) => PathTenantAddressUseCase;
 
-export const createUpdateUserAddressUseCase: UpdateUserAddressUseCaseFactory =
-  (addressRepo, usersRepo) => async (input) => {
-    const user = await usersRepo.findOneByWithRelation({
-      where: { id: input.user_id, tenant: { name: input.currentUser.tenant } },
-      relations: ['tenant', 'addresses'],
+export const createPatchTenantAddressUseCase: UpdateUserAddressUseCaseFactory =
+  (addressRepo, tenantRepo) => async (input) => {
+    const tenant = await tenantRepo.findOneByWithRelation({
+      where: {
+        id: input.tenant_id,
+      },
+      relations: ['addresses'],
     });
 
-    if (!user) {
-      throw new Error('user not found');
+    if (!tenant) {
+      throw new Error('tenant not found');
     }
 
     const address = input.address?.id
       ? await addressRepo.update(input.address.id, input.address)
       : await addressRepo.create({
-          user,
+          tenant_id: tenant.id,
           ...input.address,
           is_default: true,
         });
 
     if (input?.address?.is_default) {
-      const addressesDefault = user.addresses.filter(
+      const addressesDefault = tenant.addresses.filter(
         (a) => a.is_default === true && a.id !== address.id,
       );
 

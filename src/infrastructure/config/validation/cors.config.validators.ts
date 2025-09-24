@@ -1,8 +1,14 @@
-export function getCorsOrigin() {
-  const corsOrigin = process.env.APP_CORS_ORIGIN;
-  if (corsOrigin === 'true') return true;
-  if (corsOrigin === '*') return '*';
-  if (!corsOrigin || corsOrigin === 'false') return false;
+export function getCorsOrigin(
+  origin: string,
+  callback: (err: Error | null, allow?: boolean) => void,
+) {
+  const corsEnv = process.env.APP_CORS_ORIGIN;
+  const origins = [origin, '*', 'true'];
+  for (const o of origins) {
+    if (corsEnv?.includes(o)) {
+      return callback(null, true);
+    }
+  }
 
-  return corsOrigin.split(',').map((origin) => origin.trim());
+  return callback(new Error('Not allowed by CORS'), false);
 }

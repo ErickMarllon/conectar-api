@@ -10,6 +10,7 @@ import { Repository } from 'typeorm';
 import { PgsqlTenantM } from '../entities';
 import { AbstractRepository } from './abstract-repo.repository';
 import { aliasTenantMap } from './constants/alias-tenant-map';
+import { allowedFieldsForTenantClassification } from './constants/allowed-fields-for-tenant-classification';
 
 @Injectable()
 export class PgsqlTenantRepository
@@ -32,7 +33,8 @@ export class PgsqlTenantRepository
     const queryBuilder = this.repository
       .createQueryBuilder('tenant')
       .leftJoin('tenant.addresses', 'address')
-      .select(['tenant', 'address']);
+      .leftJoin('tenant.social', 'social')
+      .select(['tenant', 'address', 'social']);
 
     if (filters) {
       Object.entries(filters).forEach(([key, value]) => {
@@ -55,8 +57,10 @@ export class PgsqlTenantRepository
     const searchConditions = [
       `tenant.name ILIKE :search`,
       `tenant.slug ILIKE :search`,
+      `tenant.email ILIKE :search`,
       `tenant.phone_number ILIKE :search`,
       `tenant.whatsapp ILIKE :search`,
+      `tenant.is_public ILIKE :search`,
 
       `address.zip_code ILIKE :search`,
       `address.street ILIKE :search`,
@@ -73,6 +77,7 @@ export class PgsqlTenantRepository
     return await this.paginateService.paginate({
       queryBuilder,
       options: meta,
+      allowedFields: allowedFieldsForTenantClassification,
     });
   }
 }

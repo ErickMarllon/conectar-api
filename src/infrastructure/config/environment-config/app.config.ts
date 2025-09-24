@@ -16,6 +16,6 @@ export default registerAs<AppConfig>('app', () => {
     port: validated.APP_PORT,
     apiPrefix: validated.API_PREFIX,
     fallbackLanguage: validated.APP_FALLBACK_LANGUAGE,
-    corsOrigin: getCorsOrigin(),
+    corsOrigin: getCorsOrigin,
   };
 });

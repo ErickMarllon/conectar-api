@@ -49,6 +49,7 @@ import { ToggleUserStatusUseCaseModule } from '@/main/factories/usecases/user/mo
 import { UpdateSessionUserUseCaseModule } from '@/main/factories/usecases/user/modules/update-session-user-usecase.module';
 import { UpdateUserAddressUseCaseModule } from '@/main/factories/usecases/user/modules/update-user-Address-usecase.module';
 import { UpdateUserUseCaseModule } from '@/main/factories/usecases/user/modules/update-user-usecase.module';
+import { Role } from '@/shared/enums';
 import { PaginateOptions } from '@/shared/paginate/types';
 import {
   CurrentUserDto,
@@ -121,7 +122,7 @@ export class UserController {
     description: 'User profile loaded successfully',
     statusCode: HttpStatus.OK,
     fileConfig: { name: 'avatar' },
-    roles: ['ADMIN', 'OWNER', 'DEV'],
+    roles: [Role.ADMIN, Role.OWNER, Role.DEV],
   })
   async create(
     @Body() body: CreateUserInputDto,

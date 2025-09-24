@@ -5,11 +5,16 @@ import { Expose, Type } from 'class-transformer';
 import { IsBoolean, IsEnum, IsString } from 'class-validator';
 import { SocialProvidersDto } from '../../user/dto/social-providers.dto';
 
-export class LoadAllTenantOutputDto {
+export class LoadTenantOutputDto {
   @Expose()
   @ApiProperty()
   @IsString()
   id: string;
+
+  @Expose()
+  @ApiPropertyOptional()
+  @IsString()
+  email?: string;
 
   @Expose()
   @ApiPropertyOptional()
@@ -60,6 +65,11 @@ export class LoadAllTenantOutputDto {
   @ApiProperty()
   @IsBoolean()
   enable_google_calendar: boolean;
+
+  @Expose()
+  @ApiProperty()
+  @IsBoolean()
+  is_public: boolean;
 
   @Expose()
   @ApiPropertyOptional({ type: () => SocialProvidersDto })

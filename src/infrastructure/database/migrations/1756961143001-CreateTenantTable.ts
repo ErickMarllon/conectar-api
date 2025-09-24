@@ -32,6 +32,11 @@ export class CreateTenantTable1756961143001 implements MigrationInterface {
             isNullable: false,
           },
           {
+            name: 'email',
+            type: 'citext',
+            isNullable: true,
+          },
+          {
             name: 'logo_url',
             type: 'varchar',
             isNullable: true,
@@ -80,6 +85,12 @@ export class CreateTenantTable1756961143001 implements MigrationInterface {
           },
           {
             name: 'enable_google_calendar',
+            type: 'boolean',
+            isNullable: false,
+            default: false,
+          },
+          {
+            name: 'is_public',
             type: 'boolean',
             isNullable: false,
             default: false,

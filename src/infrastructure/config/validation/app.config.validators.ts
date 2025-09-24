@@ -46,11 +46,10 @@ export class AppEnvConfigValidator {
   @IsOptional()
   APP_FALLBACK_LANGUAGE: string;
 
-  @Transform(({ value }) =>
-    typeof value === 'string'
-      ? value.split(',').map((origin) => origin.trim())
-      : value,
-  )
+  @Transform(({ value }: { value: string }) => {
+    const newValue = value.split(',').map((origin) => origin.trim());
+    return newValue ? newValue : value;
+  })
   @IsArray()
   @IsString({ each: true })
   @IsOptional()

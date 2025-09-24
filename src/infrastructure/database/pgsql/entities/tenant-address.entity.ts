@@ -14,6 +14,9 @@ export class PgsqlTenantAddressM {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @Column()
+  tenant_id: string;
+
   @ManyToOne(() => PgsqlTenantM, (tenant) => tenant.addresses)
   @JoinColumn({ name: 'tenant_id' })
   tenant: PgsqlTenantM;
