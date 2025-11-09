@@ -7,8 +7,7 @@ export class Argon2Service implements CryptoGateway {
   async hash(value: string): Promise<string> {
     try {
       return await argon2.hash(value);
-    } catch (err) {
-      console.error(err);
+    } catch (_err) {
       throw new Error('Can not hash password.');
     }
   }
@@ -16,8 +15,7 @@ export class Argon2Service implements CryptoGateway {
   async verify(hash: string, value: string): Promise<boolean> {
     try {
       return await argon2.verify(hash, value);
-    } catch (err) {
-      console.error(err);
+    } catch (_err) {
       return false;
     }
   }

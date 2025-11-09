@@ -2,8 +2,7 @@ import {
   ExchangeCodeOauthUseCase,
   ProcessOauthUseCase,
 } from '@/domain/usecase/pgsql/user/auth';
-import { CurrentUser } from '@/infrastructure/http/decorators/current-user.decorator';
-import { Public } from '@/infrastructure/http/decorators/public-routes.decorator';
+import { CurrentUser, Public } from '@/infrastructure/http/decorators';
 import {
   CaptureRedirectGuard,
   CsrfStateGenerateGuard,
@@ -11,7 +10,6 @@ import {
   GoogleAuthGuard,
   MetaAuthGuard,
 } from '@/infrastructure/http/guards';
-
 import {
   ExchageCodeFactoryModule,
   OAuthRedirectFactoryModule,

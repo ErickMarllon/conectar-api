@@ -28,7 +28,6 @@ function validateConfig<T extends object>(
       })
       .join('\n');
 
-    console.error(`\n${errors.toString()}`);
     throw new Error(errorMsg);
   }
 

@@ -9,8 +9,8 @@ export class CreateTenantTable1756961143001 implements MigrationInterface {
     await queryRunner.query(`
   DO $$
   BEGIN
-    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'TenantStatus') THEN
-      CREATE TYPE "TenantStatus" AS  ENUM ('ACTIVE','INACTIVE','SUSPENDED','CANCELLED','EXPIRED');
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'tenant_status') THEN
+      CREATE TYPE "tenant_status" AS  ENUM ('ACTIVE','INACTIVE','SUSPENDED','CANCELLED','EXPIRED');
     END IF;
   END$$;
 `);
@@ -73,7 +73,7 @@ export class CreateTenantTable1756961143001 implements MigrationInterface {
           },
           {
             name: 'status',
-            type: 'TenantStatus',
+            type: 'tenant_status',
             isNullable: false,
             default: "'ACTIVE'",
           },
@@ -124,7 +124,7 @@ export class CreateTenantTable1756961143001 implements MigrationInterface {
             columnNames: ['plan_id'],
           },
           {
-            name: 'IDX_TenantStatus',
+            name: 'IDX_tenant_status',
             columnNames: ['status'],
           },
         ],
@@ -145,6 +145,6 @@ export class CreateTenantTable1756961143001 implements MigrationInterface {
 
   public async down(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.dropTable('tenant');
-    await queryRunner.query(`DROP TYPE "TenantStatus"`);
+    await queryRunner.query(`DROP TYPE "tenant_status"`);
   }
 }

@@ -11,11 +11,11 @@ export const getTypeOrmModuleOptions = (configService: ConfigService): any => {
   const typeOrmConfig: TypeOrmModuleOptions = {
     type: 'postgres',
     url: dbConfig.url,
-    // port: dbConfig.port,
-    // host: dbConfig.host,
-    // username: dbConfig.user,
-    // password: dbConfig.password,
-    // database: dbConfig.db_name,
+    host: dbConfig.host,
+    port: dbConfig.port,
+    username: dbConfig.user,
+    password: dbConfig.password,
+    database: dbConfig.db_name,
     synchronize: false,
     logging: false,
     ssl: {

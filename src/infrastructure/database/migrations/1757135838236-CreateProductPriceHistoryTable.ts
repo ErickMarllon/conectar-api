@@ -31,7 +31,7 @@ export class CreateProductPriceHistoryTable1757135838236
           },
           {
             name: 'discount_type',
-            type: 'ValueType',
+            type: 'value_type',
             isNullable: true,
           },
           {

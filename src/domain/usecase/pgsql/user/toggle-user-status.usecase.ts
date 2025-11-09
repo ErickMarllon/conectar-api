@@ -11,7 +11,6 @@ export const createToggleUserStatusUseCase: ToggleUserStatusUseCaseFactory =
   (usersRepo) => async (id) => {
     const userExists = await usersRepo.findOneBy({ id });
 
-    console.log('🚀 ~ createToggleUserStatusUseCase ~ userExists:', userExists);
     if (!userExists) {
       throw new Error('user not found');
     }

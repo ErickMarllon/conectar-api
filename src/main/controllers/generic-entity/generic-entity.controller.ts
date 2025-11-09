@@ -1,6 +1,5 @@
 import { GetAnyEntity } from '@/domain/usecase/pgsql/getAnyEntity';
-import { paginateHeaders } from '@/infrastructure/http/decorators/header.decorator';
-import { Public } from '@/infrastructure/http/decorators/public-routes.decorator';
+import { paginateHeaders, Public } from '@/infrastructure/http/decorators';
 import { GenericEntityFactoryModule } from '@/main/factories/usecases/generic-model.factory.module';
 import { PaginateOptions } from '@/shared/paginate/types';
 

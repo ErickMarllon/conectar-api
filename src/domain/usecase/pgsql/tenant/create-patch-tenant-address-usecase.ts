@@ -5,13 +5,11 @@ import {
 } from '@/domain/contracts/pgsql/repositories';
 import { UpdateAddressDto } from '@/infrastructure/http/dtos/address/update-address-data.dto';
 
-import { plainToInstance } from 'class-transformer';
-
 export type PathTenantAddressUseCase = (input: {
   tenant_id: string;
   address: UpdateAddressDto;
   currentUser: Payload['sub'];
-}) => Promise<UpdateAddressDto | undefined>;
+}) => Promise<void>;
 
 export type UpdateUserAddressUseCaseFactory = (
   addressRepo: ITenantAddressRepository,
@@ -52,8 +50,4 @@ export const createPatchTenantAddressUseCase: UpdateUserAddressUseCaseFactory =
         }
       }
     }
-
-    return plainToInstance(UpdateAddressDto, address, {
-      excludeExtraneousValues: true,
-    });
   };

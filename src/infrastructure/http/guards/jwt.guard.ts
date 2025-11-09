@@ -49,7 +49,6 @@ export class JwtAuthGuard extends AuthGuard(SessionSource.JWT) {
       const message =
         msgMap[info.name] || msgMap[info.message] || 'Unauthorized';
 
-      console.warn('JwtAuthGuard:', message);
       throw new UnauthorizedException(message);
     }
 

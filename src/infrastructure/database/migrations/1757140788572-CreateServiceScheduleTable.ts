@@ -10,24 +10,24 @@ export class CreateServiceScheduleTable1757140788572
 
     await queryRunner.query(
       `DO $$ BEGIN
-        IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'ServiceScheduleStatus') THEN
-          CREATE TYPE "ServiceScheduleStatus" AS ENUM ('PENDING','CONFIRMED','IN_PROGRESS','COMPLETED','CANCELLED');
+        IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'service_schedule_status') THEN
+          CREATE TYPE "service_schedule_status" AS ENUM ('PENDING','CONFIRMED','IN_PROGRESS','COMPLETED','CANCELLED');
         END IF;
       END$$;`,
     );
 
     await queryRunner.query(
       `DO $$ BEGIN
-        IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'ValueType') THEN
-          CREATE TYPE "ValueType" AS ENUM ('FIXED','PERCENTAGE');
+        IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'value_type') THEN
+          CREATE TYPE "value_type" AS ENUM ('FIXED','PERCENTAGE');
         END IF;
       END$$;`,
     );
 
     await queryRunner.query(
       `DO $$ BEGIN
-        IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'PaymentStatus') THEN
-          CREATE TYPE "PaymentStatus" AS ENUM ('PAID', 'FAILED', 'REFUNDED', 'PENDING', 'COMPLETED', 'CANCELED');
+        IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'paymentstatus') THEN
+          CREATE TYPE "paymentstatus" AS ENUM ('PAID', 'FAILED', 'REFUNDED', 'PENDING', 'COMPLETED', 'CANCELED');
         END IF;
       END$$;`,
     );
@@ -60,7 +60,7 @@ export class CreateServiceScheduleTable1757140788572
           },
           {
             name: 'status',
-            type: 'ServiceScheduleStatus',
+            type: 'service_schedule_status',
             isNullable: false,
             default: `'PENDING'`,
           },
@@ -80,12 +80,12 @@ export class CreateServiceScheduleTable1757140788572
           },
           {
             name: 'deposit_type',
-            type: 'ValueType',
+            type: 'value_type',
             isNullable: true,
           },
           {
             name: 'deposit_status',
-            type: 'PaymentStatus',
+            type: 'paymentstatus',
             isNullable: true,
             default: `'PENDING'`,
           },

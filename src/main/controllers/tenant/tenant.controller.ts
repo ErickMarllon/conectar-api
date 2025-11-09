@@ -1,6 +1,38 @@
+import { Payload } from '@/domain/contracts/auth/jwt';
+import {
+  CreateGetTenantUseCase,
+  CreateListTenantUseCase,
+  CreatePatchTenantUseCase,
+  CreateTenantUseCase,
+  DeleteTenantAddressUseCase,
+  GetTenantSocialUseCase,
+  PatchTenantSocialUseCase,
+  PathTenantAddressUseCase,
+} from '@/domain/usecase/pgsql/tenant';
+import {
+  ApiAuth,
+  ApiPublic,
+  CurrentUser,
+  paginateHeaders,
+} from '@/infrastructure/http/decorators';
+import { UpdateAddressDto } from '@/infrastructure/http/dtos/address/update-address-data.dto';
+import {
+  CreateDelTenantAddressUseCaseModule,
+  CreateGetTenantSocialUseCaseModule,
+  CreateGetTenantUseCaseModule,
+  CreateListTenantUseCaseModule,
+  CreatePatchTenantAddressUseCaseModule,
+  CreatePatchTenantSessionUseCaseModule,
+  CreatePatchTenantUseCaseModule,
+  CreateTenantUseCaseModule,
+} from '@/main/factories/usecases/tenant';
+import { SocialInputDto, SocialOutputDto } from '@/shared/dto/social-input.dto';
+import { Role } from '@/shared/enums';
+import { PaginateOptions } from '@/shared/paginate/types';
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpStatus,
   Inject,
@@ -11,37 +43,14 @@ import {
   UploadedFiles,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiExtraModels, ApiTags } from '@nestjs/swagger';
-
-import { Payload } from '@/domain/contracts/auth/jwt';
-import {
-  CreateGetTenantUseCase,
-  CreateListTenantUseCase,
-  CreatePatchTenantUseCase,
-  CreateTenantUseCase,
-  PathTenantAddressUseCase,
-} from '@/domain/usecase/pgsql/tenant';
-import {
-  ApiAuth,
-  ApiPublic,
-} from '@/infrastructure/http/decorators/api-response-type.decorator';
-import { CurrentUser } from '@/infrastructure/http/decorators/current-user.decorator';
-import { paginateHeaders } from '@/infrastructure/http/decorators/header.decorator';
-import { UpdateAddressDto } from '@/infrastructure/http/dtos/address/update-address-data.dto';
-import { CreateGetTenantUseCaseModule } from '@/main/factories/usecases/tenant/modules/create-get-tenant-usecase.module';
-import { CreateListTenantUseCaseModule } from '@/main/factories/usecases/tenant/modules/create-list-tenant-usecase.module';
-import { CreatePatchTenantAddressUseCaseModule } from '@/main/factories/usecases/tenant/modules/create-patch-Address-usecase.module';
-import { CreatePatchTenantUseCaseModule } from '@/main/factories/usecases/tenant/modules/create-patch-tenant-usecase.module';
-import { CreateTenantUseCaseModule } from '@/main/factories/usecases/tenant/modules/create-tenant-usecase.module';
-import { Role } from '@/shared/enums';
-import { PaginateOptions } from '@/shared/paginate/types';
 import { CurrentUserDto } from '../user/dto';
 import {
+  CreateTenantInputDto,
+  CreateTenantOutputDto,
   LoadAllTenantInputDto,
   LoadTenantOutputDto,
   PathTenantInputDto,
 } from './dto';
-import { CreateTenantInputDto } from './dto/create-tenant-input.dto';
-import { CreateTenantOutputDto } from './dto/create-tenant-output.dto';
 
 @ApiTags('tenant')
 @ApiBearerAuth()
@@ -59,18 +68,12 @@ export class TenantController {
     private readonly pathUser: CreatePatchTenantUseCase,
     @Inject(CreatePatchTenantAddressUseCaseModule.PATCH_TENANT_ADDRES_USECASE)
     private readonly pathTenantAddress: PathTenantAddressUseCase,
-
-    //-------
-    // @Inject(GetUserProfileUseCaseModule.GET_USER_PROFILE_USECASE)
-    // private readonly getUserProfile: GetUserProfileUseCase,
-    // @Inject(UpdateUserUseCaseModule.UPDATE_USER_USECASE)
-    // private readonly updateUser: UpdateUserUseCase,
-    // @Inject(DeleteUserUseCaseModule.DELETE_USER_USECASE)
-    // private readonly deleteUser: DeleteUserUseCase,
-    // @Inject(ToggleUserStatusUseCaseModule.TOGGLE_USER_STATUS_USECASE)
-    // private readonly updateUserAddress: UpdateUserAddressUseCase,
-    // @Inject(DeleteUserAddressUseCaseModule.DELETE_USER_ADDRESS_USECASE)
-    // private readonly deleteUserAddress: DeleteUserAddressUseCase,
+    @Inject(CreateDelTenantAddressUseCaseModule.DELETE_TENANT_ADDRESS_USECASE)
+    private readonly deleteTenantAddress: DeleteTenantAddressUseCase,
+    @Inject(CreateGetTenantSocialUseCaseModule.GET_TENANT_SOCIAL_USECASE)
+    private readonly getTenantSocial: GetTenantSocialUseCase,
+    @Inject(CreatePatchTenantSessionUseCaseModule.PATCH_SOCIAL_USER_USECASE)
+    private readonly patchTenantSocial: PatchTenantSocialUseCase,
   ) {}
 
   @Get('/list')
@@ -162,7 +165,6 @@ export class TenantController {
   // ADDRESS
   @Patch('/:id/address')
   @ApiAuth({
-    type: UpdateAddressDto,
     description: 'User updated successfully',
     statusCode: HttpStatus.OK,
   })
@@ -178,43 +180,35 @@ export class TenantController {
     });
   }
 
-  // @Delete('/:id/address')
-  // @ApiAuth({
-  //   description: 'User deleted successfully',
-  //   statusCode: HttpStatus.NO_CONTENT,
-  // })
-  // async deleteAddress(@Param('id') id: string) {
-  //   return await this.deleteUserAddress(id);
-  // }
+  @Delete('/:id/address')
+  @ApiAuth({
+    description: 'User deleted successfully',
+    statusCode: HttpStatus.NO_CONTENT,
+  })
+  async deleteAddress(@Param('id') id: string) {
+    return await this.deleteTenantAddress(id);
+  }
 
   // SOCIAL
-  // @Patch('/:id/social')
-  // @ApiAuth({
-  //   description: 'User updated successfully',
-  //   statusCode: HttpStatus.OK,
-  // })
-  // async updateSocial(
-  //   @Param('id') user_id: string,
-  //   @Body() data: UpdateSocialUserInputDto,
-  //   @CurrentUser() currentUser: CurrentUserDto,
-  // ) {
-  //   return await this.updateSocialUser({
-  //     user_id,
-  //     data,
-  //     tenant: currentUser.tenant,
-  //   });
-  // }
+  @Patch('/:id/social')
+  @ApiAuth({
+    description: 'User updated successfully',
+    statusCode: HttpStatus.OK,
+  })
+  async updateSocial(@Param('id') id: string, @Body() data: SocialInputDto) {
+    return await this.patchTenantSocial({
+      id,
+      data,
+    });
+  }
 
-  // @Get('/:id/social')
-  // @ApiAuth({
-  //   type: LoadUserOutputDto,
-  //   description: 'User loaded successfully',
-  //   statusCode: HttpStatus.OK,
-  // })
-  // async social(
-  //   @Param('id') id: string,
-  //   @CurrentUser() currentUser: CurrentUserDto,
-  // ) {
-  //   return await this.getSocialUser({ id, tenant: currentUser.tenant });
-  // }
+  @Get('/:id/social')
+  @ApiAuth({
+    type: SocialOutputDto,
+    description: 'User loaded successfully',
+    statusCode: HttpStatus.OK,
+  })
+  async social(@Param('id') id: string) {
+    return await this.getTenantSocial({ id });
+  }
 }

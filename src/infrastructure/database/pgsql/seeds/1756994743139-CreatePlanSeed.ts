@@ -1,3 +1,4 @@
+import { PlanInterval } from '@/shared/enums';
 import { DataSource } from 'typeorm';
 import { Seeder, SeederFactoryManager } from 'typeorm-extension';
 import { PgsqlPlanM } from '../entities';
@@ -9,45 +10,73 @@ export class CreatePlanSeed1756994743139 implements Seeder {
     dataSource: DataSource,
     factoryManager: SeederFactoryManager,
   ): Promise<void> {
+    const planRepository = dataSource.getRepository(PgsqlPlanM);
     const planFactory = factoryManager.get(PgsqlPlanM);
 
     const plansData = [
       {
         name: 'FREE',
+        tier: 'Free',
+        interval: PlanInterval.ANNUALLY,
         max_users: 5,
         max_products: 10,
         max_services: 10,
-        description: 'System Owner',
+        description: 'Plano gratuito anual',
       },
       {
-        name: 'BASIC',
-        max_users: 20,
-        max_products: 50,
-        max_services: 50,
-        description: 'System Administrator',
+        name: 'FREE',
+        tier: 'Free',
+        interval: PlanInterval.MONTHLY,
+        max_users: 5,
+        max_products: 10,
+        max_services: 10,
+        description: 'Plano gratuito mensal',
       },
       {
         name: 'PRO',
+        tier: 'Pro',
+        interval: PlanInterval.ANNUALLY,
         max_users: 100,
         max_products: 200,
         max_services: 200,
-        description: 'System Manager',
+        description: 'Plano profissional anual',
+      },
+      {
+        name: 'PRO',
+        tier: 'Pro',
+        interval: PlanInterval.MONTHLY,
+        max_users: 100,
+        max_products: 200,
+        max_services: 200,
+        description: 'Plano profissional mensal',
       },
       {
         name: 'ENTERPRISE',
-        max_users: 100000000,
-        max_products: 1000000,
-        max_services: 1000000,
-        description: 'System Employee',
+        tier: 'Enterprise',
+        interval: PlanInterval.ANNUALLY,
+        max_users: 10000,
+        max_products: 1000,
+        max_services: 1000,
+        description: 'Plano empresarial anual',
+      },
+      {
+        name: 'ENTERPRISE',
+        tier: 'Enterprise',
+        interval: PlanInterval.MONTHLY,
+        max_users: 10000,
+        max_products: 1000,
+        max_services: 1000,
+        description: 'Plano empresarial mensal',
       },
     ];
 
     for (const planData of plansData) {
-      const existing = await dataSource
-        .getRepository(PgsqlPlanM)
-        .findOneBy({ name: planData.name });
+      const exists = await planRepository.findOneBy({
+        name: planData.name,
+        interval: planData.interval,
+      });
 
-      if (!existing) {
+      if (!exists) {
         await planFactory.save(planData);
         console.log(`Plan ${planData.name} created successfully`);
       } else {
@@ -55,7 +84,6 @@ export class CreatePlanSeed1756994743139 implements Seeder {
       }
     }
 
-    await planFactory.saveMany(1);
     console.log('Random plan created and Plans seed completed!');
   }
 }

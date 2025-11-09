@@ -1,9 +1,14 @@
 import { Module } from '@nestjs/common';
-import { CreateGetTenantUseCaseModule } from './modules/create-get-tenant-usecase.module';
-import { CreateListTenantUseCaseModule } from './modules/create-list-tenant-usecase.module';
-import { CreatePatchTenantAddressUseCaseModule } from './modules/create-patch-Address-usecase.module';
-import { CreatePatchTenantUseCaseModule } from './modules/create-patch-tenant-usecase.module';
-import { CreateTenantUseCaseModule } from './modules/create-tenant-usecase.module';
+import {
+  CreateDelTenantAddressUseCaseModule,
+  CreateGetTenantSocialUseCaseModule,
+  CreateGetTenantUseCaseModule,
+  CreateListTenantUseCaseModule,
+  CreatePatchTenantAddressUseCaseModule,
+  CreatePatchTenantUseCaseModule,
+  CreateTenantUseCaseModule,
+} from './modules';
+import { CreatePatchTenantSessionUseCaseModule } from './modules/create-patch-tenant-session-usecase.module';
 
 @Module({
   imports: [
@@ -12,6 +17,9 @@ import { CreateTenantUseCaseModule } from './modules/create-tenant-usecase.modul
     CreateGetTenantUseCaseModule.register(),
     CreatePatchTenantUseCaseModule.register(),
     CreatePatchTenantAddressUseCaseModule.register(),
+    CreateDelTenantAddressUseCaseModule.register(),
+    CreateGetTenantSocialUseCaseModule.register(),
+    CreatePatchTenantSessionUseCaseModule.register(),
   ],
   exports: [
     CreateTenantUseCaseModule,
@@ -19,6 +27,9 @@ import { CreateTenantUseCaseModule } from './modules/create-tenant-usecase.modul
     CreateGetTenantUseCaseModule,
     CreatePatchTenantUseCaseModule,
     CreatePatchTenantAddressUseCaseModule,
+    CreateDelTenantAddressUseCaseModule,
+    CreateGetTenantSocialUseCaseModule,
+    CreatePatchTenantSessionUseCaseModule,
   ],
 })
 export class TenantUseCasesModule {}

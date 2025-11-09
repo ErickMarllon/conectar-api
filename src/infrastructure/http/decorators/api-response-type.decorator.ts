@@ -150,7 +150,6 @@ function buildFile(fileConfig?: FileField | FileField[]): MethodDecorator[] {
   if (!fileConfig) return decorators;
 
   decorators.push(ApiConsumes('multipart/form-data'));
-  console.log('🚀 ~ buildFile ~ fileConfig:', fileConfig);
 
   if (Array.isArray(fileConfig)) {
     decorators.push(

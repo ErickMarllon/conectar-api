@@ -1,4 +1,6 @@
 import {
+  CreateUserUseCase,
+  DeleteUserAddressUseCase,
   DeleteUserUseCase,
   GetSocialUserUseCase,
   GetUserProfileUseCase,
@@ -6,6 +8,7 @@ import {
   ListUsersUseCase,
   ToggleUserStatusUseCase,
   UpdateSocialUserUseCase,
+  UpdateUserAddressUseCase,
   UpdateUserUseCase,
 } from '@/domain/usecase/pgsql/user';
 
@@ -31,36 +34,37 @@ import {
 import { Express } from 'express';
 
 import { Payload } from '@/domain/contracts/auth/jwt';
-import { CreateUserUseCase } from '@/domain/usecase/pgsql/user/create-user-usecase';
-import { DeleteUserAddressUseCase } from '@/domain/usecase/pgsql/user/delete-user-address-usecase';
-import { UpdateUserAddressUseCase } from '@/domain/usecase/pgsql/user/update-user-address-usecase';
-import { ApiAuth } from '@/infrastructure/http/decorators/api-response-type.decorator';
-import { CurrentUser } from '@/infrastructure/http/decorators/current-user.decorator';
-import { paginateHeaders } from '@/infrastructure/http/decorators/header.decorator';
+import {
+  ApiAuth,
+  CurrentUser,
+  paginateHeaders,
+} from '@/infrastructure/http/decorators';
 import { UpdateAddressDto } from '@/infrastructure/http/dtos/address/update-address-data.dto';
-import { CreateUserUseCaseModule } from '@/main/factories/usecases/user/modules/create-user-usecase.module';
-import { DeleteUserAddressUseCaseModule } from '@/main/factories/usecases/user/modules/delete-user-address-usecase.module';
-import { DeleteUserUseCaseModule } from '@/main/factories/usecases/user/modules/delete-user-usecase.module';
-import { GetSocialUserUseCaseModule } from '@/main/factories/usecases/user/modules/get-social-user-usecase.module';
-import { GetUserProfileUseCaseModule } from '@/main/factories/usecases/user/modules/get-user-profile-usecase.module';
-import { GetUserUseCaseModule } from '@/main/factories/usecases/user/modules/get-user-usecase.module';
-import { ListUsersUseCaseModule } from '@/main/factories/usecases/user/modules/list-users-usecase.module';
-import { ToggleUserStatusUseCaseModule } from '@/main/factories/usecases/user/modules/toggle-user-status-usecase.module';
-import { UpdateSessionUserUseCaseModule } from '@/main/factories/usecases/user/modules/update-session-user-usecase.module';
-import { UpdateUserAddressUseCaseModule } from '@/main/factories/usecases/user/modules/update-user-Address-usecase.module';
-import { UpdateUserUseCaseModule } from '@/main/factories/usecases/user/modules/update-user-usecase.module';
+import {
+  CreateUserUseCaseModule,
+  DeleteUserAddressUseCaseModule,
+  DeleteUserUseCaseModule,
+  GetSocialUserUseCaseModule,
+  GetUserProfileUseCaseModule,
+  GetUserUseCaseModule,
+  ListUsersUseCaseModule,
+  ToggleUserStatusUseCaseModule,
+  UpdateSessionUserUseCaseModule,
+  UpdateUserAddressUseCaseModule,
+  UpdateUserUseCaseModule,
+} from '@/main/factories/usecases/user/modules';
 import { Role } from '@/shared/enums';
 import { PaginateOptions } from '@/shared/paginate/types';
 import {
+  CreateUserInputDto,
   CurrentUserDto,
   LoadAllUserInputDto,
   LoadAllUserOutputDto,
+  LoadUserOutputDto,
   UpdateSocialUserInputDto,
   UpdateUserInputDto,
   UserProfileDto,
 } from './dto';
-import { CreateUserInputDto } from './dto/create-user-input.dto';
-import { LoadUserOutputDto } from './dto/load-user-output.dto';
 
 @ApiTags('user')
 @ApiBearerAuth()

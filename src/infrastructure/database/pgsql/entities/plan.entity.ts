@@ -4,10 +4,12 @@ import {
   CreateDateColumn,
   Entity,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { PgsqlTenantSubscriptionM } from './tenant-subscription.entity';
+import { PgsqlPlanDetailM } from './plan-detail.entity';
+import { PgsqlPlanFeatureM } from './plan-feature.entity';
 import { PgsqlTenantM } from './tenant.entity';
 
 @Entity('plan')
@@ -18,8 +20,8 @@ export class PgsqlPlanM {
   @Column()
   name: string;
 
-  @Column({ type: 'enum', enum: PlanInterval, default: PlanInterval.MONTHLY })
-  interval: PlanInterval;
+  @Column()
+  tier: string;
 
   @Column()
   max_users: number;
@@ -29,6 +31,9 @@ export class PgsqlPlanM {
 
   @Column()
   max_services: number;
+
+  @Column({ type: 'enum', enum: PlanInterval, default: PlanInterval.MONTHLY })
+  interval: PlanInterval;
 
   @Column({ nullable: true })
   description: string;
@@ -42,9 +47,15 @@ export class PgsqlPlanM {
   @OneToMany(() => PgsqlTenantM, (tenant) => tenant.plan)
   tenants: PgsqlTenantM[];
 
-  @OneToMany(
-    () => PgsqlTenantSubscriptionM,
-    (subscription) => subscription.plan,
-  )
-  subscriptions: PgsqlTenantSubscriptionM[];
+  @OneToOne(() => PgsqlPlanDetailM, (detail) => detail.plan)
+  details: PgsqlPlanDetailM;
+
+  @OneToMany(() => PgsqlPlanFeatureM, (feature) => feature.plan)
+  features: PgsqlPlanFeatureM[];
+
+  // @OneToMany(
+  //   () => PgsqlTenantSubscriptionM,
+  //   (subscription) => subscription.plan,
+  // )
+  // subscriptions: PgsqlTenantSubscriptionM[];
 }

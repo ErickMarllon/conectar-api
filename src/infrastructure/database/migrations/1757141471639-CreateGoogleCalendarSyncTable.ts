@@ -10,8 +10,8 @@ export class CreateGoogleCalendarSyncTable1757141471639
 
     await queryRunner.query(
       `DO $$ BEGIN
-        IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'ServiceScheduleStatus') THEN
-          CREATE TYPE "ServiceScheduleStatus" AS ENUM ('PENDING','CONFIRMED','IN_PROGRESS','COMPLETED','CANCELLED');
+        IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'service_schedule_status') THEN
+          CREATE TYPE "service_schedule_status" AS ENUM ('PENDING','CONFIRMED','IN_PROGRESS','COMPLETED','CANCELLED');
         END IF;
       END$$;`,
     );
@@ -44,7 +44,7 @@ export class CreateGoogleCalendarSyncTable1757141471639
           },
           {
             name: 'status',
-            type: 'ServiceScheduleStatus',
+            type: 'service_schedule_status',
             isNullable: false,
             default: `'PENDING'`,
           },

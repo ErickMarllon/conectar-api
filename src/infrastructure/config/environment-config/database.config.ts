@@ -5,8 +5,9 @@ import { DatabaseEnvConfigValidator } from '../validation/database.config.valida
 import validateConfig from './validate-config';
 
 export const databaseConfig = () => {
-  const NODE_ENV = process.env.NODE_ENV;
-  dotenv.config({ path: `./env/${NODE_ENV}.env` });
+  dotenv.config({
+    path: [`env/.env.${process.env.NODE_ENV}`, 'env/.env', '.env'],
+  });
 
   const DATABASE = validateConfig<DatabaseEnvConfigValidator>(
     process.env,
@@ -29,6 +30,5 @@ export const databaseConfig = () => {
 };
 
 export default registerAs<DatabaseConfig>('database', () => {
-  console.info(`Register DatabaseConfig from environment variables`);
   return databaseConfig();
 });

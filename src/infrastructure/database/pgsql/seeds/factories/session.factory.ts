@@ -14,8 +14,6 @@ export const SessionFactory = setSeederFactory(PgsqlSessionM, async (faker) => {
   session.refresh_token = faker.datatype.boolean()
     ? faker.string.uuid()
     : undefined;
-  session.access_token_expires = Number(faker.number.bigInt(1000000n));
-  session.refresh_token_expires = Number(faker.number.bigInt(1000000n));
   session.ip_address = faker.internet.ip();
   session.user_agent = faker.internet.userAgent();
   session.created_at = new Date();

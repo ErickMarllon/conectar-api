@@ -15,8 +15,6 @@ export type FindUsersParams = {
   role?: string;
   is_verified?: boolean;
   status?: UserStatus;
-  country_code?: string;
-  area_code?: string;
   phone_number?: string;
   whatsapp?: string;
   zip_code?: string;

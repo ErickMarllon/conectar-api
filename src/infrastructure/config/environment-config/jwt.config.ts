@@ -4,8 +4,6 @@ import { JwtEnvConfigValidator } from '../validation/jwt.config.validators';
 import validateConfig from './validate-config';
 
 export default registerAs<JwtConfig>('jwt', () => {
-  console.info(`Register JwtConfig from environment variables`);
-
   const validated = validateConfig(process.env, JwtEnvConfigValidator);
 
   return {

@@ -3,7 +3,6 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -19,10 +18,7 @@ export class PgsqlTenantSubscriptionM {
   @ManyToOne(() => PgsqlTenantM, (tenant) => tenant.subscriptions)
   tenant: PgsqlTenantM;
 
-  @ManyToOne(() => PgsqlPlanM, (plan) => plan.subscriptions, {
-    onDelete: 'SET NULL',
-  })
-  @JoinColumn({ name: 'plan_id' })
+  @ManyToOne(() => PgsqlPlanM)
   plan: PgsqlPlanM;
 
   @Column({ type: 'decimal', precision: 12, scale: 2 })

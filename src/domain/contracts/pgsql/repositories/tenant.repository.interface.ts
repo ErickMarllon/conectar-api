@@ -1,3 +1,4 @@
+import { PgsqlTenantM } from '@/infrastructure/database/pgsql';
 import { PaginateOptions, PaginateResponse } from '@/shared/paginate/types';
 import { PgsqlTenant } from '../entities';
 import { AbstractRepoI } from './base-entity.interface';
@@ -38,6 +39,6 @@ export type FindAllTenantsParams = {
 };
 export type Paginatedtenants = PaginateResponse<PgsqlTenant>;
 
-export type ITenantRepository = AbstractRepoI<PgsqlTenant> & {
+export type ITenantRepository = AbstractRepoI<PgsqlTenantM> & {
   findAll(input: FindAllTenantsParams): Promise<Paginatedtenants | undefined>;
 };

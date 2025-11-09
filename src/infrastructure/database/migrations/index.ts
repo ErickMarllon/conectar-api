@@ -1,5 +1,7 @@
 export * from './1756961037866-CreateRoleTable';
 export * from './1756961092821-CreatePlanTable';
+export * from './1756961092822-CreatePlanDetailTable';
+export * from './1756961092823-CreatePlanFeatureTable';
 export * from './1756961143001-CreateTenantTable';
 export * from './1757129697948-CreateTenantNotificarionSettingTable';
 export * from './1757130042467-CreateTenantSocialTable';

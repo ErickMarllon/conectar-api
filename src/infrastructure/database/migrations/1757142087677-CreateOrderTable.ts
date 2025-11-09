@@ -9,8 +9,8 @@ export class CreateOrderTable1757142087677 implements MigrationInterface {
     await queryRunner.query(`
   DO $$
   BEGIN
-    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'PaymentMethod') THEN
-      CREATE TYPE "PaymentMethod" AS ENUM ('CASH','CREDIT_CARD','DEBIT_CARD','PIX');
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'payment_method') THEN
+      CREATE TYPE "payment_method" AS ENUM ('CASH','CREDIT_CARD','DEBIT_CARD','PIX');
     END IF;
   END$$;
 `);
@@ -18,8 +18,8 @@ export class CreateOrderTable1757142087677 implements MigrationInterface {
     await queryRunner.query(`
   DO $$
   BEGIN
-    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'DeliveryMethod_type') THEN
-      CREATE TYPE "DeliveryMethod_type" AS ENUM ('DELIVERY','PICKUP');
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'delivery_method_type') THEN
+      CREATE TYPE "delivery_method_type" AS ENUM ('DELIVERY','PICKUP');
     END IF;
   END$$;
 `);
@@ -58,18 +58,18 @@ export class CreateOrderTable1757142087677 implements MigrationInterface {
             isNullable: false,
           },
           {
-            name: 'PaymentMethod',
-            type: 'PaymentMethod',
+            name: 'payment_method',
+            type: 'payment_method',
             isNullable: false,
           },
           {
             name: 'DeliveryMethod',
-            type: 'DeliveryMethod_type',
+            type: 'delivery_method_type',
             isNullable: false,
           },
           {
             name: 'status',
-            type: 'ServiceScheduleStatus',
+            type: 'service_schedule_status',
             isNullable: false,
             default: `'PENDING'`,
           },

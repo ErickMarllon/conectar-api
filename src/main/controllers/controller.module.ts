@@ -30,11 +30,13 @@ import { MulterModule } from '@nestjs/platform-express';
 import { AuthFactoryModule } from '../factories/usecases/auth';
 import { GenericEntityFactoryModule } from '../factories/usecases/generic-model.factory.module';
 import { OAuthModule } from '../factories/usecases/oauth/oauth.module';
+import { PlanUseCasesModule } from '../factories/usecases/plan';
 import { TenantUseCasesModule } from '../factories/usecases/tenant/tenant.factory.module';
 import { UserUseCasesModule } from '../factories/usecases/user/user.factory.module';
 import { AppController } from './app.controller';
 import { AuthController } from './auth/auth.controller';
 import { OAuthController } from './auth/oauth.controller';
+import { PlanController } from './plan/plan.controller';
 import { TenantController } from './tenant/tenant.controller';
 
 @Module({
@@ -49,6 +51,7 @@ import { TenantController } from './tenant/tenant.controller';
     AuthFactoryModule,
     UserUseCasesModule,
     TenantUseCasesModule,
+    PlanUseCasesModule,
     AwsS3Module,
     GenericEntityFactoryModule.register(),
     PaginateModule,
@@ -58,6 +61,7 @@ import { TenantController } from './tenant/tenant.controller';
     AuthController,
     OAuthController,
     UserController,
+    PlanController,
     TenantController,
     GenericEntityController,
     AppController,

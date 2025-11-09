@@ -19,7 +19,6 @@ export type CreatePatchTenantUseCaseFactory = (
 
 export const createPatchTenantUseCase: CreatePatchTenantUseCaseFactory =
   (tenantRepo, awsS3) => async (input) => {
-    console.log('🚀 ~ createPatchTenantUseCase ~ input:', input);
     const tenant = await tenantRepo.findOneBy({ id: input.id });
 
     if (!tenant) {

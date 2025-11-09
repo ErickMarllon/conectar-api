@@ -7,8 +7,8 @@ export class CreateGatewaySettingTable1757144333423
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
       `DO $$ BEGIN
-        IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'GatewayProvider') THEN
-          CREATE TYPE "GatewayProvider" AS ENUM ('STRIPE', 'MERCADO_PAGO', 'PAYPAL','BSPAY');
+        IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'gateway_provider') THEN
+          CREATE TYPE "gateway_provider" AS ENUM ('STRIPE', 'MERCADO_PAGO', 'PAYPAL','BSPAY');
         END IF;
       END$$;`,
     );
@@ -37,7 +37,7 @@ export class CreateGatewaySettingTable1757144333423
           },
           {
             name: 'provider',
-            type: 'GatewayProvider',
+            type: 'gateway_provider',
             isNullable: false,
           },
           {

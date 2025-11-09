@@ -4,8 +4,8 @@ import {
   SigninFactoryModule,
   SignoutFactoryModule,
   SignupFactoryModule,
+  UpdateUserPasswordUseCaseModule,
 } from './modules';
-import { UpdateUserPasswordUseCaseModule } from './modules/update-user-password-usecase.module';
 
 @Module({
   imports: [

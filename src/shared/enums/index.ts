@@ -1,6 +1,7 @@
 export * from './delivery-method.enum';
 export * from './gateway-provider.enum';
 export * from './gateway-status.enum';
+export * from './lang.enum';
 export * from './notification-event-status.enum';
 export * from './order.enum';
 export * from './paginate-mode.enum';

@@ -16,7 +16,6 @@ export type CreateGetTenantUseCaseFactory = (
 
 export const createGetTenantUseCase: CreateGetTenantUseCaseFactory =
   (tenantRepo, awsS3) => async (input) => {
-    console.log('🚀 ~ createGetTenantUseCase ~ input:', input);
     const tenant = await tenantRepo.findOneByWithRelation({
       where: { id: input.id },
       relations: ['addresses'],

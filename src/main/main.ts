@@ -83,4 +83,4 @@ async function bootstrap() {
   return app;
 }
 
-void bootstrap();
+bootstrap();

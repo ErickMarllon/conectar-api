@@ -9,9 +9,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { PgsqlTenantM } from '../entities';
 import { AbstractRepository } from './abstract-repo.repository';
-import { aliasTenantMap } from './constants/alias-tenant-map';
 import { allowedFieldsForTenantClassification } from './constants/allowed-fields-for-tenant-classification';
-
 @Injectable()
 export class PgsqlTenantRepository
   extends AbstractRepository<PgsqlTenantM>
@@ -37,41 +35,38 @@ export class PgsqlTenantRepository
       .select(['tenant', 'address', 'social']);
 
     if (filters) {
-      Object.entries(filters).forEach(([key, value]) => {
-        if (!value) return;
-        const alias = aliasTenantMap[key] || 'tenant';
-        const column = key;
+      for (const rule of allowedFieldsForTenantClassification) {
+        const { alias, field, operator, isUuid } = rule;
 
-        if (typeof value === 'boolean') {
-          queryBuilder.andWhere(`${alias}.${column} = :${key}`, {
-            [key]: value,
-          });
-        } else {
-          queryBuilder.andWhere(`${alias}.${column} ILIKE :${key}`, {
-            [key]: `%${value}%`,
-          });
+        if (filters[field]) {
+          const param = `${alias}_${field}`;
+
+          if (operator === 'eq') {
+            queryBuilder.andWhere(
+              `${alias}.${field}${isUuid ? '::text ILIKE ' : ' = '}:${param}`,
+              {
+                [param]: isUuid ? `%${filters[field]}%` : filters[field],
+              },
+            );
+          }
+
+          if (operator === 'ilike') {
+            queryBuilder.andWhere(`${alias}.${field} ILIKE :${param}`, {
+              [param]: `%${filters[field]}%`,
+            });
+          }
         }
-      });
+      }
     }
 
-    const searchConditions = [
-      `tenant.name ILIKE :search`,
-      `tenant.slug ILIKE :search`,
-      `tenant.email ILIKE :search`,
-      `tenant.phone_number ILIKE :search`,
-      `tenant.whatsapp ILIKE :search`,
-      `tenant.is_public ILIKE :search`,
-
-      `address.zip_code ILIKE :search`,
-      `address.street ILIKE :search`,
-      `address.city ILIKE :search`,
-      `address.state ILIKE :search`,
-      `address.country ILIKE :search`,
-    ];
     if (searchTerm?.trim()) {
-      queryBuilder.andWhere(`${searchConditions.join(' OR ')}`, {
-        search: `%${searchTerm}%`,
-      });
+      for (const f of allowedFieldsForTenantClassification) {
+        if (f.operator === 'ilike') {
+          queryBuilder.orWhere(`${f.alias}.${f.field} ILIKE :search`, {
+            search: `%${searchTerm}%`,
+          });
+        }
+      }
     }
 
     return await this.paginateService.paginate({

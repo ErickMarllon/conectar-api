@@ -3,21 +3,20 @@ import {
   SigninUseCase,
   SignOutUseCase,
   SignupUseCase,
+  UpdateUserPasswordUseCase,
 } from '@/domain/usecase/pgsql/user/auth';
-// import { ApiResponseType } from '@/infrastructure/http/decorators/api-response-type.decorator';
-import { UpdateUserPasswordUseCase } from '@/domain/usecase/pgsql/user/auth/update-user-password-usecase';
 import {
   ApiAuth,
   ApiPublic,
-} from '@/infrastructure/http/decorators/api-response-type.decorator';
-import { CurrentUser } from '@/infrastructure/http/decorators/current-user.decorator';
+  CurrentUser,
+} from '@/infrastructure/http/decorators';
 import {
   RefreshTokenFactoryModule,
   SigninFactoryModule,
   SignoutFactoryModule,
   SignupFactoryModule,
+  UpdateUserPasswordUseCaseModule,
 } from '@/main/factories/usecases/auth';
-import { UpdateUserPasswordUseCaseModule } from '@/main/factories/usecases/auth/modules/update-user-password-usecase.module';
 import {
   Body,
   Controller,
@@ -37,9 +36,13 @@ import {
 } from '@nestjs/swagger';
 import { Request } from 'express';
 import { CurrentUserDto } from '../user/dto';
-import { AuthOutputDto, RefreshTokenOutputDto, RegisterInputDto } from './dto';
-import { SigninInputDto } from './dto/login-input.dto';
-import { UpdateUserPasswordInputDto } from './dto/update-user-password-input.dto';
+import {
+  AuthOutputDto,
+  RefreshTokenOutputDto,
+  RegisterInputDto,
+  SigninInputDto,
+  UpdateUserPasswordInputDto,
+} from './dto';
 
 @ApiTags('auth')
 @ApiExtraModels()

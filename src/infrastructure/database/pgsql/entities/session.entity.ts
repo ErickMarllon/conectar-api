@@ -44,26 +44,6 @@ export class PgsqlSessionM {
   @Column({ nullable: true })
   refresh_token?: string;
 
-  @Column({
-    type: 'bigint',
-    nullable: true,
-    transformer: {
-      to: (value: number | null) => value,
-      from: (value: string | null) => (value ? parseInt(value, 10) : null),
-    },
-  })
-  access_token_expires?: number;
-
-  @Column({
-    type: 'bigint',
-    nullable: true,
-    transformer: {
-      to: (value: number | null) => value,
-      from: (value: string | null) => (value ? parseInt(value, 10) : null),
-    },
-  })
-  refresh_token_expires?: number;
-
   @Column({ nullable: true })
   ip_address: string;
 

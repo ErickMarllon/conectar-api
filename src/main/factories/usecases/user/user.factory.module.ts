@@ -1,15 +1,17 @@
 import { Module } from '@nestjs/common';
-import { CreateUserUseCaseModule } from './modules/create-user-usecase.module';
-import { DeleteUserAddressUseCaseModule } from './modules/delete-user-address-usecase.module';
-import { DeleteUserUseCaseModule } from './modules/delete-user-usecase.module';
-import { GetSocialUserUseCaseModule } from './modules/get-social-user-usecase.module';
-import { GetUserProfileUseCaseModule } from './modules/get-user-profile-usecase.module';
-import { GetUserUseCaseModule } from './modules/get-user-usecase.module';
-import { ListUsersUseCaseModule } from './modules/list-users-usecase.module';
-import { ToggleUserStatusUseCaseModule } from './modules/toggle-user-status-usecase.module';
-import { UpdateSessionUserUseCaseModule } from './modules/update-session-user-usecase.module';
-import { UpdateUserAddressUseCaseModule } from './modules/update-user-Address-usecase.module';
-import { UpdateUserUseCaseModule } from './modules/update-user-usecase.module';
+import {
+  CreateUserUseCaseModule,
+  DeleteUserAddressUseCaseModule,
+  DeleteUserUseCaseModule,
+  GetSocialUserUseCaseModule,
+  GetUserProfileUseCaseModule,
+  GetUserUseCaseModule,
+  ListUsersUseCaseModule,
+  ToggleUserStatusUseCaseModule,
+  UpdateSessionUserUseCaseModule,
+  UpdateUserAddressUseCaseModule,
+  UpdateUserUseCaseModule,
+} from './modules';
 
 @Module({
   imports: [

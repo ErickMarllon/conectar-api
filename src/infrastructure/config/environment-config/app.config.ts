@@ -6,7 +6,6 @@ import { getCorsOrigin } from '../validation/cors.config.validators';
 import validateConfig from './validate-config';
 
 export default registerAs<AppConfig>('app', () => {
-  console.info(`Register AppConfig from environment variables`);
   const validated = validateConfig(process.env, AppEnvConfigValidator);
 
   return {

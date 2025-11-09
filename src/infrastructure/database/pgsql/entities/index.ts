@@ -10,6 +10,8 @@ export * from './order-item.entity';
 export * from './order.entity';
 export * from './payment.entity';
 export * from './permission.entity';
+export * from './plan-detail.entity';
+export * from './plan-feature.entity';
 export * from './plan.entity';
 export * from './product-review.entity';
 export * from './product.entity';

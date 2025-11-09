@@ -43,6 +43,9 @@ export const createSigninOAuthUseCase: OauthUseCaseFactory =
       if (tenant?.status !== TenantStatus.ACTIVE) {
         throw new BadRequestException(`Entre em contato com o suporte.`);
       }
+      if (!tenant.plan) {
+        throw new BadRequestException('Plano inválido ou não encontrado');
+      }
 
       const userExists = await usersRepo.findOneByWithRelation({
         where: { email: userOptions.email, tenant: { id: tenant.id } },
@@ -161,7 +164,6 @@ export const createSigninOAuthUseCase: OauthUseCaseFactory =
         excludeExtraneousValues: true,
       });
     } catch (error) {
-      console.log('🚀 ~ createSigninOAuthUseCase ~ error:', error);
       throw new NotFoundException(error);
     }
   };

@@ -1,19 +1,23 @@
 import { PlanInterval } from '@/shared/enums';
+import { PgsqlPlanDetail } from './plan-detail';
+import { PgsqlPlanFeature } from './plan-feature';
 import { PgsqlTenant } from './tenant';
-import { PgsqlTenantSubscription } from './tenant-subscription';
 
 export class PgsqlPlan {
   id: string;
   name: string;
-  interval: PlanInterval;
+  tier: string;
   max_users: number;
   max_products: number;
   max_services: number;
-  description: string;
+  interval: PlanInterval;
+  description?: string;
   created_at: Date;
   updated_at: Date;
+
   tenants: PgsqlTenant[];
-  subscriptions: PgsqlTenantSubscription[];
+  details?: PgsqlPlanDetail;
+  features?: PgsqlPlanFeature[];
 
   constructor(input: PgsqlPlan) {
     Object.assign(this, input);

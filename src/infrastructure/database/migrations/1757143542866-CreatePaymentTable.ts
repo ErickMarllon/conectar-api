@@ -5,8 +5,8 @@ export class CreatePaymentTable1757143542866 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
       `DO $$ BEGIN
-        IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'GatewayProvider') THEN
-          CREATE TYPE "GatewayProvider" AS ENUM ('STRIPE', 'MERCADO_PAGO', 'PAYPAL','BSPAY');
+        IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'gateway_provider') THEN
+          CREATE TYPE "gateway_provider" AS ENUM ('STRIPE', 'MERCADO_PAGO', 'PAYPAL','BSPAY');
         END IF;
       END$$;`,
     );
@@ -39,12 +39,12 @@ export class CreatePaymentTable1757143542866 implements MigrationInterface {
           },
           {
             name: 'gateway',
-            type: 'GatewayProvider',
+            type: 'gateway_provider',
             isNullable: false,
           },
           {
             name: 'status',
-            type: 'PaymentStatus',
+            type: 'paymentstatus',
             isNullable: false,
             default: `'PENDING'`,
           },
@@ -87,7 +87,7 @@ export class CreatePaymentTable1757143542866 implements MigrationInterface {
             columnNames: ['service_schedule_id'],
           },
           {
-            name: 'IDX_PaymentStatus',
+            name: 'IDX_paymentstatus',
             columnNames: ['status'],
           },
           {

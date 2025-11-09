@@ -33,7 +33,7 @@ export class CreateServicePriceHistoryTable1757141634498
           },
           {
             name: 'discount_type',
-            type: 'ValueType',
+            type: 'value_type',
             isNullable: true,
           },
           {

@@ -9,8 +9,8 @@ export class CreateProductTable1757135161506 implements MigrationInterface {
     await queryRunner.query(`
   DO $$
   BEGIN
-    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'ValueType') THEN
-      CREATE TYPE "ValueType" AS ENUM ('FIXED', 'PERCENTAGE');
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'value_type') THEN
+      CREATE TYPE "value_type" AS ENUM ('FIXED', 'PERCENTAGE');
     END IF;
   END$$;
 `);
@@ -82,7 +82,7 @@ export class CreateProductTable1757135161506 implements MigrationInterface {
           },
           {
             name: 'discount_type',
-            type: 'ValueType',
+            type: 'value_type',
             isNullable: true,
           },
           {

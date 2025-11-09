@@ -22,7 +22,6 @@ export const createFindSocialUserByIdUseCase: LoadSocialUserUseCaseFactory =
       where: { id: input.id, tenant: { name: input.tenant } },
       relations: ['tenant', 'social'],
     });
-    console.log('🚀 ~ createFindSocialUserByIdUseCase ~ user:', user);
 
     if (!user) {
       throw new BadRequestException('user not found');

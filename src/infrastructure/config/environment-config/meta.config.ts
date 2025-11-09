@@ -4,7 +4,6 @@ import { MetaEnvConfigValidator } from '../validation/meta.config.validators';
 import validateConfig from './validate-config';
 
 export default registerAs<MetaConfig>('meta', () => {
-  console.info(`Register JwtConfig from environment variables`);
   const validated = validateConfig(process.env, MetaEnvConfigValidator);
 
   return {

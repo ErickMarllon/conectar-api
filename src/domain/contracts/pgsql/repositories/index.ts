@@ -6,6 +6,7 @@ export * from './event-type.repository.interface';
 export * from './gateway-setting.repository.interface';
 export * from './google-calendar.repository.interface';
 export * from './invoice.repository.interface';
+export * from './log';
 export * from './media.repository.interface';
 export * from './notification-event.repository.interface';
 export * from './oauth.repository.interface';

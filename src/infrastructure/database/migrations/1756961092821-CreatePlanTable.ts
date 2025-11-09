@@ -32,6 +32,11 @@ export class CreatePlanTable1756961092821 implements MigrationInterface {
             isNullable: false,
           },
           {
+            name: 'tier',
+            type: 'citext',
+            isNullable: false,
+          },
+          {
             name: 'max_users',
             type: 'integer',
             isNullable: false,
@@ -71,8 +76,8 @@ export class CreatePlanTable1756961092821 implements MigrationInterface {
         ],
         indices: [
           {
-            name: 'IDX_plan_name',
-            columnNames: ['name'],
+            name: 'IDX_plan_tier_interval',
+            columnNames: ['tier', 'interval'],
             isUnique: true,
           },
           {

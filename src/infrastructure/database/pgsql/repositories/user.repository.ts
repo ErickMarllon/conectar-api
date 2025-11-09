@@ -9,9 +9,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { PgsqlUserM } from '../entities';
 import { AbstractRepository } from './abstract-repo.repository';
-import { aliasUserMap } from './constants/alias-user-map';
 import { allowedFieldsForUserClassification } from './constants/allowed-fields-for-user-classification';
-import { searchConditions } from './constants/search-user-conditions';
 
 @Injectable()
 export class PgsqlUserRepository
@@ -47,33 +45,39 @@ export class PgsqlUserRepository
     }
 
     if (filters) {
-      Object.entries(filters).forEach(([key, value]) => {
-        if (!value) return;
-        const alias = aliasUserMap[key] || 'user';
-        const column = key === 'role' || key === 'tenant' ? 'name' : key;
+      for (const rule of allowedFieldsForUserClassification) {
+        const { alias, field, operator, isUuid } = rule;
 
-        if (typeof value === 'boolean') {
-          queryBuilder.andWhere(`${alias}.${column} = :${key}`, {
-            [key]: value,
-          });
-        } else if (key === 'status') {
-          queryBuilder.andWhere(`${alias}.${column}  = :${key}`, {
-            [key]: value,
-          });
-        } else {
-          queryBuilder.andWhere(`${alias}.${column} ILIKE :${key}`, {
-            [key]: `%${value}%`,
-          });
+        if (filters[field]) {
+          const param = `${alias}_${field}`;
+
+          if (operator === 'eq') {
+            queryBuilder.andWhere(
+              `${alias}.${field}${isUuid ? '::text ILIKE ' : ' = '}:${param}`,
+              {
+                [param]: isUuid ? `%${filters[field]}%` : filters[field],
+              },
+            );
+          }
+
+          if (operator === 'ilike') {
+            queryBuilder.andWhere(`${alias}.${field} ILIKE :${param}`, {
+              [param]: `%${filters[field]}%`,
+            });
+          }
         }
-      });
+      }
     }
 
     if (searchTerm?.trim()) {
-      queryBuilder.andWhere(`${searchConditions.join(' OR ')}`, {
-        search: `%${searchTerm}%`,
-      });
+      for (const f of allowedFieldsForUserClassification) {
+        if (f.operator === 'ilike') {
+          queryBuilder.orWhere(`${f.alias}.${f.field} ILIKE :search`, {
+            search: `%${searchTerm}%`,
+          });
+        }
+      }
     }
-
     return await this.paginateService.paginate({
       queryBuilder,
       options: meta,

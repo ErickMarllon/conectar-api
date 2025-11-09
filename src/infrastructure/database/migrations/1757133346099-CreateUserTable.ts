@@ -9,8 +9,8 @@ export class CreateUserTable1757133346099 implements MigrationInterface {
     await queryRunner.query(`
   DO $$
   BEGIN
-    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'UserStatus') THEN
-      CREATE TYPE "UserStatus" AS ENUM ('ACTIVE', 'PENDING','BANNED');
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'user_status') THEN
+      CREATE TYPE "user_status" AS ENUM ('ACTIVE', 'PENDING','BANNED');
     END IF;
   END$$;
 `);
@@ -73,7 +73,7 @@ export class CreateUserTable1757133346099 implements MigrationInterface {
           },
           {
             name: 'status',
-            type: 'UserStatus',
+            type: 'user_status',
             isNullable: false,
             default: `'ACTIVE'`,
           },

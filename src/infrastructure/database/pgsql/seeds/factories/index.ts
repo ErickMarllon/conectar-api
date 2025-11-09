@@ -2,6 +2,8 @@ export * from './address.factory';
 export * from './category.factory';
 export * from './event-type.factory';
 export * from './permission.factory';
+export * from './plan-detail.factory';
+export * from './plan-feature.factory';
 export * from './plan.factory';
 export * from './product-review.factory';
 export * from './product.factory';
