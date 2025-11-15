@@ -30,6 +30,20 @@ export class CreatePlanDetailTable1756961092822 implements MigrationInterface {
             isNullable: true,
           },
           {
+            name: 'discount',
+            type: 'numeric',
+            precision: 10,
+            scale: 2,
+            isNullable: true,
+          },
+          {
+            name: 'original_price',
+            type: 'numeric',
+            precision: 10,
+            scale: 2,
+            isNullable: true,
+          },
+          {
             name: 'billing_period',
             type: 'varchar',
             length: '100',

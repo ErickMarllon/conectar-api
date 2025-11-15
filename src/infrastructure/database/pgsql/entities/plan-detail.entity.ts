@@ -38,6 +38,32 @@ export class PgsqlPlanDetailM {
   })
   price?: number;
 
+  @Column({
+    type: 'numeric',
+    precision: 10,
+    scale: 2,
+    nullable: true,
+    transformer: {
+      to: (value?: number) => value,
+      from: (value: string | null): number | null =>
+        value ? parseFloat(value) : null,
+    },
+  })
+  discount?: number;
+
+  @Column({
+    type: 'numeric',
+    precision: 10,
+    scale: 2,
+    nullable: true,
+    transformer: {
+      to: (value?: number) => value,
+      from: (value: string | null): number | null =>
+        value ? parseFloat(value) : null,
+    },
+  })
+  original_price?: number;
+
   @Column({ type: 'varchar', length: 100, nullable: true })
   billing_period?: string;
 

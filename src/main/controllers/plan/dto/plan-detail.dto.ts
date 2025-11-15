@@ -22,6 +22,18 @@ export class PlanDetailDto {
   @Expose()
   @ApiProperty({ required: false })
   @IsOptional()
+  @IsNumber()
+  discount?: number;
+
+  @Expose()
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsNumber()
+  original_price?: number;
+
+  @Expose()
+  @ApiProperty({ required: false })
+  @IsOptional()
   @IsString()
   billing_period?: string;
 

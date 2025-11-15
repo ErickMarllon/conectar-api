@@ -30,6 +30,12 @@ export class ListPlanInputDto {
 
   @Expose()
   @ApiPropertyOptional()
+  @IsString()
+  @IsOptional()
+  tier?: string;
+
+  @Expose()
+  @ApiPropertyOptional()
   @IsEnum(PlanInterval)
   @IsOptional()
   interval?: PlanInterval;
